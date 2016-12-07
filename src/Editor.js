@@ -24,10 +24,12 @@ function openFile(event) {
     var file = event.target.files[0];
     var jsZip = new JSZip()
     jsZip.loadAsync(file).then(function (zip) {
-        var x=50, y=47;
+        var x=50, y=50;
         var offsets = [[-1, -1],[0, -1],[1, -1], [-1, 0],[0, 0],[1, 0], [-1, 1],[0, 1],[1, 1]];
         for(var i=0; i < offsets.length; i++) {
-            zip.files["h0x" + (x + offsets[i][0]) + "y" + (y + offsets[i][1])].async('arraybuffer').then(function (fileData) {
+            var name = "h0x" + (x + offsets[i][0]) + "y" + (y + offsets[i][1]);
+            console.error("reading " + name);
+            zip.file(name).async('arraybuffer').then(function (fileData) {
                 var view = new DataView(fileData);
                 Sectors.push(view);
             })
@@ -84,9 +86,9 @@ function loadSectors() {
         var geometry = new THREE.PlaneGeometry((TILE_MESH_SIZE * TILE_COUNT), (TILE_MESH_SIZE * TILE_COUNT), TILE_COUNT, TILE_COUNT);
         for (var x = 0; x < TILE_COUNT; x++) {
             for (var y = 0; y < TILE_COUNT; y++) {
-                var tile = new Tile(sectorIndex, sectX, sectY, x, y + (s * 48), view.getUint8(idx), view.getUint8(idx + 1), view.getUint8(idx + 2), view.getUint8(idx + 3), view.getUint8(idx + 4), view.getUint8(idx + 5), view.getUint32(idx + 6), s);
-                Tiles[((x * 48) + y) * sectorIndex] = tile;
-                var pos = ((x * 48) + y);
+                var tile = new Tile(sectorIndex + 1, sectX, sectY, x, y + (s * 48), view.getUint8(idx), view.getUint8(idx + 1), view.getUint8(idx + 2), view.getUint8(idx + 3), view.getUint8(idx + 4), view.getUint8(idx + 5), view.getUint32(idx + 6), s);
+
+                Tiles[((x * 48) + y) * (sectorIndex + 1)] = tile;
                 idx += 10;
             }
         }
@@ -99,7 +101,7 @@ function loadSectors() {
         // set elevation
         for (var xx = 0; xx < 48; xx++) {
             for (var yy = 0; yy < 48; yy++) {
-                t = (xx * 48 + yy) * sectorIndex;
+                t = (xx * 48 + yy) * (sectorIndex + 1);
                 v = (xx * 49 + yy);
                 if (Tiles[t] == null) continue;
                 geometry.vertices[v].z = Tiles[t].groundElevation / 20;
@@ -111,7 +113,8 @@ function loadSectors() {
         l = geometry.faces.length / 2;
         for (var i = 0; i < l; i++) {
             var j = 2 * i;
-            var til = Tiles[i * sectorIndex];
+            var til = Tiles[i * (sectorIndex + 1)];
+
             if (til == null)
                 continue;
             if (til.groundTexture > 0) { // tile gradient
@@ -195,7 +198,7 @@ function loadSectors() {
         l = geometry.faces.length / 2;
         for (var i = 0; i < l; i++) {
             var j = 2 * i;
-            var til = Tiles[i * sectorIndex];
+            var til = Tiles[i * (sectorIndex + 1)];
             if (til == null)
                 continue;
             if (til.verticalWall > 0) {
@@ -205,8 +208,8 @@ function loadSectors() {
                 overlayGeom.faces[1].materialIndex = 2;
                 var wall = new THREE.Mesh(overlayGeom, new THREE.MeshFaceMaterial(materials));
                 wall.rotation.x = Math.PI / 2;
-                wall.position.x = (til.x ) + (48 * sectX);
-                wall.position.y =( til.y  )  + (48 * sectY);
+                wall.position.x = (til.x );
+                wall.position.y =( til.y  );
 
               //  wall.position.set(til.x, til.y, 10);
               //  wall.position.z = ((til.groundElevation/ 20) + 5);
