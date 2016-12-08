@@ -1,2 +1,4 @@
 .idea/modules.xml
 .idea/vcs.xml
+*.xml
+.idea/Starter.iml

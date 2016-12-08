@@ -24,7 +24,7 @@ function openFile(event) {
     var file = event.target.files[0];
     var jsZip = new JSZip()
     jsZip.loadAsync(file).then(function (zip) {
-        var x=50, y=50;
+        var x=50, y=47;
         var offsets = [[-1, -1],[0, -1],[1, -1], [-1, 0],[0, 0],[1, 0], [-1, 1],[0, 1],[1, 1]];
         for(var i=0; i < offsets.length; i++) {
             var name = "h0x" + (x + offsets[i][0]) + "y" + (y + offsets[i][1]);
@@ -53,7 +53,7 @@ function prepMaterials() {
     floor.wrapS = floor.wrapT = THREE.RepeatWrapping;
     floor.repeat.set(16, 16);
     materials[4] = new THREE.MeshBasicMaterial({map: floor}); // floor wooden
-    materials[5] = new THREE.MeshBasicMaterial({color: 0xffffff}); // grey paths
+    materials[5] = new THREE.MeshBasicMaterial({color: 0xA9A9A9}); // mountain sides
     materials[6] = new THREE.MeshBasicMaterial({color: 0x6699FF}); // grey paths
 
     // set base tile gradient from array. starting them at 100.
@@ -104,9 +104,18 @@ function loadSectors() {
                 t = (xx * 48 + yy) * (sectorIndex + 1);
                 v = (xx * 49 + yy);
                 if (Tiles[t] == null) continue;
-                geometry.vertices[v].z = Tiles[t].groundElevation / 20;
+
+                var base = 0;
+                var multi = 0.04;
+                if(Tiles[t].groundElevation < 128) {
+                    base -= multi * (128 - Tiles[t].groundElevation);
+                } else {
+                    base += multi * Math.abs((128 - Tiles[t].groundElevation));
+                }
+                geometry.vertices[v].z = base;
             }
         }
+
 
 
         // paint tile
@@ -117,6 +126,8 @@ function loadSectors() {
 
             if (til == null)
                 continue;
+
+
             if (til.groundTexture > 0) { // tile gradient
                 geometry.faces[j].materialIndex = 100 + til.groundTexture;
                 geometry.faces[j + 1].materialIndex = 100 + til.groundTexture;
