@@ -13,11 +13,16 @@ var mouse, raycaster, isShiftDown = false;
 var camera, stats;
 var Sectors = new Array();
 var materials = [];
+var overlay_map = {};
 
 function initEditor() {
-    setup();
-    html();
-    animate();
+    try {
+        setup();
+        html();
+        animate();
+    } catch(err) {
+        alert(err);
+    }
 }
 
 function openFile(event) {
@@ -35,46 +40,88 @@ function openFile(event) {
                 Sectors.push(view);
             })
         }
-        loadSectors();
+        //loadSectors();
     })
 }
 
 function prepMaterials() {
-    materials[0] = new THREE.MeshBasicMaterial({color: 0x367f23}); // green grass
-    materials[1] = new THREE.MeshBasicMaterial({color: 0x404040}); // grey paths
+
+
+    // ground textures start at 500, to give room for other materials
+    try {
+
+        materials[0] = new THREE.MeshBasicMaterial({color: 0xffffff});
+        for (var i = 0; i < tileColors.length; i++) {
+            materials[500 + i] = new THREE.MeshBasicMaterial({
+                color: tileColors[i]
+            });
+        }
+
+        var floor = new THREE.ImageUtils.loadTexture('img/3223.png');
+        floor.wrapS = floor.wrapT = THREE.RepeatWrapping;
+        floor.repeat.set(16, 16);
+
+
+        // index is the overlay ID.
+        overlay_map[1] = new THREE.MeshBasicMaterial({color: 0x404040}); // grey tile
+
+        overlay_map[5] = new THREE.MeshBasicMaterial({color: 0x404040}); //grey tile
+        overlay_map[6] = new THREE.MeshBasicMaterial({color: 0x6F0410}); // red tile
+        overlay_map[16] = new THREE.MeshBasicMaterial({color: 0x000000}); // black tile
+        overlay_map[2] = new THREE.MeshBasicMaterial({color: 0x6699FF}); // water
+        overlay_map[9] = new THREE.MeshBasicMaterial({color: 0xA9A9A9}); // grey mountain side surface
+        // new THREE.MeshBasicMaterial({color: 0x367f23});
+
+        overlay_map[3] = new THREE.MeshBasicMaterial({map: floor}); // floor wooden
+        // vertical walls starts at 300
+        overlay_map[300 + 1] = new THREE.MeshBasicMaterial({map: new THREE.ImageUtils.loadTexture('img/3222.png')});
+
+        // horizontal walls start at 350
+        overlay_map[350 + 1] = new THREE.MeshBasicMaterial({map: new THREE.ImageUtils.loadTexture('img/3222v.png')});
+
+        for (var i = 0; i < 500; i++) {
+            var obj = overlay_map[i];
+            if (obj != null) {
+            console.error("found " + i);
+                materials[i] = obj;
+            }
+        }
+        materials[0] = new THREE.MeshBasicMaterial({color: 0xffffff});
+    } catch(error) {
+        console.error(error);
+    }
+
+
+
+
+
+   /* materials[0] = new THREE.MeshBasicMaterial({color: 0x367f23}); // green grass
+   // materials[1] = new THREE.MeshBasicMaterial({color: 0x404040}); // grey paths
     materials[2] = new THREE.MeshBasicMaterial({
-        map: new THREE.ImageUtils.loadTexture('img/3222.png'),
-        side: THREE.DoubleSide
+        map: new THREE.ImageUtils.loadTexture('img/3222.png')
     }); // walls
     materials[3] = new THREE.MeshBasicMaterial({
-        map: new THREE.ImageUtils.loadTexture('img/3222v.png'),
-        side: THREE.DoubleSide
-    }); // walls vert
+        map: new THREE.ImageUtils.loadTexture('img/3222v.png')
+    });
     var floor = new THREE.ImageUtils.loadTexture('img/3223.png');
+   // floor.rotate.x = Math.PI / 2;
     floor.wrapS = floor.wrapT = THREE.RepeatWrapping;
     floor.repeat.set(16, 16);
     materials[4] = new THREE.MeshBasicMaterial({map: floor}); // floor wooden
     materials[5] = new THREE.MeshBasicMaterial({color: 0xA9A9A9}); // mountain sides
-    materials[6] = new THREE.MeshBasicMaterial({color: 0x6699FF}); // grey paths
-
-    // set base tile gradient from array. starting them at 100.
-    for (var i = 0; i < tileColors.length; i++) {
-        materials[100 + i] = new THREE.MeshBasicMaterial({
-            color: tileColors[i]
-        });
-    }
-
+  //  materials[6] = new THREE.MeshBasicMaterial({color: 0x6699FF}); // grey paths
+  //  materials[7] = new THREE.MeshBasicMaterial({color: 0x6F0410}); // red bank floor
+    materials[8] = new THREE.MeshBasicMaterial({color: 0x000000}); // red bank floor
+*/
 
 }
 function loadSectors() {
 
     var Tiles = new Array((TILE_COUNT*TILE_COUNT) * Sectors.length);
-    console.log(Sectors.length);
 
     var sectX = 0;
     var sectY = 0;
 
-    prepMaterials();
     var masterGeometry = new THREE.PlaneGeometry(0 , 0 , 0, 0);
     for(var s=0; s < Sectors.length; s++) {
         if (sectX == 3) {
@@ -124,14 +171,36 @@ function loadSectors() {
             if (til == null)
                 continue;
 
+            if (til.groundTexture > 0) { // tile gradient
+                 geometry.faces[j].materialIndex = til.groundTexture + 500;
+                 geometry.faces[j + 1].materialIndex = til.groundTexture + 500;
+            }
 
+            var obj = overlay_map[til.groundOverlay];
+            if(obj != null) {
+                geometry.faces[j].materialIndex = til.groundOverlay;
+                geometry.faces[j + 1].materialIndex = til.groundOverlay;
+            }
+
+
+
+            /*if(til.groundOverlay in overlay_map) {
+                geometry.faces[j].materialIndex = overlay_map[til.groundOverlay];
+                geometry.faces[j + 1].materialIndex = overlay_map[til.groundOverlay];
+            }*/
+            /*
             if (til.groundTexture > 0) { // tile gradient
                 geometry.faces[j].materialIndex = 100 + til.groundTexture;
                 geometry.faces[j + 1].materialIndex = 100 + til.groundTexture;
             }
-            if (til.groundOverlay == 1) { // grey paths
+            if (til.groundOverlay == 1 || til.groundOverlay == 6) { // grey paths
                 geometry.faces[j].materialIndex = 1;
                 geometry.faces[j + 1].materialIndex = 1;
+            }
+
+            if (til.groundOverlay == 6) { // red bank floors
+                geometry.faces[j].materialIndex = 7;
+                geometry.faces[j + 1].materialIndex = 7;
             }
 
             if (til.groundOverlay == 3) { // floor
@@ -150,6 +219,11 @@ function loadSectors() {
                 geometry.faces[j + 1].materialIndex = 6;
             }
 
+            if (til.groundOverlay == 16) { // black chequered tile
+                geometry.faces[j].materialIndex = 8;
+                geometry.faces[j + 1].materialIndex = 8;
+            }*/
+
         }
 
         /**
@@ -165,12 +239,19 @@ function loadSectors() {
             if (til == null)
                 continue;
 
+
             if (til.horizontalWall > 0) {
 
 
+
                 var overlayGeom = new THREE.PlaneGeometry(1, 1);
-                overlayGeom.faces[0].materialIndex = 3;
-                overlayGeom.faces[1].materialIndex = 3;
+                var obj = overlay_map[til.horizontalWall + 350];
+                if(obj != null) {
+                    overlayGeom.faces[0].materialIndex = til.horizontalWall + 350;
+                    overlayGeom.faces[1].materialIndex = til.horizontalWall + 350;
+                }
+               // overlayGeom.faces[0].materialIndex = 300 + til.horizontalWall;
+              //  overlayGeom.faces[1].materialIndex = 300 + til.horizontalWall;
                 var wall = new THREE.Mesh(overlayGeom, new THREE.MeshFaceMaterial(materials));
                 wall.rotation.y = Math.PI / 2;
                 wall.position.x = til.x - (TILE_COUNT / 2);
@@ -191,12 +272,17 @@ function loadSectors() {
             if (til.verticalWall > 0) {
 
                 var overlayGeom = new THREE.PlaneGeometry(1, 1);
-                overlayGeom.faces[0].materialIndex = 2;
-                overlayGeom.faces[1].materialIndex = 2;
+                var obj = overlay_map[til.verticalWall + 300];
+                if(obj != null) {
+                    overlayGeom.faces[0].materialIndex = til.verticalWall + 300;
+                    overlayGeom.faces[1].materialIndex = til.verticalWall + 300;
+                }
+               // overlayGeom.faces[0].materialIndex = 350 + til.verticalWall;
+               // overlayGeom.faces[1].materialIndex = 350 + til.verticalWall;
                 var wall = new THREE.Mesh(overlayGeom, new THREE.MeshFaceMaterial(materials));
                 wall.rotation.x = Math.PI / 2;
                 wall.position.x = til.x - (TILE_COUNT / 2) + 0.5;
-                wall.position.y = til.y - (TILE_COUNT / 2)
+                wall.position.y = til.y - (TILE_COUNT / 2);
 
                 var base = 0;
                 var multi = 0.04;
@@ -229,6 +315,13 @@ function loadSectors() {
 
     }
 
+    for (var i = 0; i < materials.length; i++) {
+        var obj = materials[i];
+        if (obj != null) {
+            console.error("foundd " + i);
+          //  materials[i] = obj;
+        }
+    }
     mesh = new THREE.Mesh(masterGeometry, new THREE.MeshFaceMaterial(materials));
     scene.add(mesh);
 
@@ -237,6 +330,7 @@ function loadSectors() {
 
 function setup() {
 
+    prepMaterials();
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
     var light = new THREE.AmbientLight(  0x404040 ); // soft white light
