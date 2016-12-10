@@ -14,6 +14,7 @@ var camera, stats;
 var Sectors = new Array();
 var overlay_map = {};
 var Tiles;
+var mesh;
 var masterGeometry;
 
 
@@ -67,18 +68,20 @@ function unpackSectors() {
     }
 }
 
+var masterGeometry;
 
+function temp() {
+
+}
 
 function updateSectors() {
 
 
-
-    var masterGeometry = new THREE.PlaneGeometry(0 , 0 , 0, 0);
+    scene.remove(mesh);
+    masterGeometry = new THREE.PlaneGeometry(0 , 0 , 0, 0);
 
     var sectX = 0;
     var sectY = 0;
-
-    var masterGeometry = new THREE.PlaneGeometry(0 , 0 , 0, 0);
 
     for(var s=0; s < Sectors.length; s++) {
         if (sectX == Math.sqrt(Sectors.length)) {
@@ -88,147 +91,7 @@ function updateSectors() {
         var sectorIndex = s;
         var idx = 0;
         var view = Sectors[s];
-        var geometry = new THREE.PlaneGeometry((TILE_MESH_SIZE * TILE_COUNT), (TILE_MESH_SIZE * TILE_COUNT), TILE_COUNT, TILE_COUNT);
-
-        /**
-         *
-         * Tile Elevations
-         *
-         */
-
-
-
-        for (var xx = 0; xx < 48; xx++) {
-            for (var yy = 0; yy < 48; yy++) {
-                t = (xx * 48 + yy) + 48 * 48 * sectorIndex;
-                v = (xx * 49 + yy);
-                if (Tiles[t] == null) continue;
-
-                var base = 0;
-                var multi = 0.04;
-                if(Tiles[t].groundElevation < 128) {
-                    base -= multi * (128 - Tiles[t].groundElevation);
-                } else {
-                    base += multi * Math.abs((128 - Tiles[t].groundElevation));
-                }
-                geometry.vertices[v].z = base;
-            }
-        }
-
-
-
-        /**
-         *
-         * Tile gradients & overlays
-         *
-         */
-        l = geometry.faces.length / 2;
-        for (var i = 0; i < l; i++) {
-            var j = 2 * i;
-            var til = Tiles[i + 48 * 48 * sectorIndex];
-
-            if (til == null)
-                continue;
-
-            if (til.groundTexture > 0) { // tile gradient
-                geometry.faces[j].materialIndex = til.groundTexture + 500;
-                geometry.faces[j + 1].materialIndex = til.groundTexture + 500;
-            }
-
-            var obj = overlay_map[til.groundOverlay];
-            if(obj != null) {
-                geometry.faces[j].materialIndex = til.groundOverlay;
-                geometry.faces[j + 1].materialIndex = til.groundOverlay;
-            }
-        }
-
-        /**
-         *
-         * Walls
-         *
-         */
-        var tempGeom = new THREE.PlaneGeometry(0, 0);
-        var tempMesh = new THREE.Mesh(tempGeom, new THREE.MeshFaceMaterial(materials));
-        l = geometry.faces.length / 2;
-
-
-
-
-        for (var i = 0; i < l; i++) {
-            var j = 2 * i;
-            var til = Tiles[i + 48 * 48 * sectorIndex];
-            if (til == null)
-                continue;
-
-            var base = 0;
-            var multi = 0.04;
-            if(til.groundElevation < 128) {
-                base -= multi * (128 - til.groundElevation);
-            } else {
-                base += multi * Math.abs((128 - til.groundElevation));
-            }
-            if (til.verticalWall >  0) {
-                var overlayGeom = new THREE.PlaneGeometry(1, 1);
-                var obj = overlay_map[til.verticalWall + 300];
-                if(obj != null) {
-                    overlayGeom.faces[0].materialIndex = til.verticalWall + 300;
-                    overlayGeom.faces[1].materialIndex = til.verticalWall + 300;
-                    var wall = new THREE.Mesh(overlayGeom, new THREE.MeshFaceMaterial(materials));
-                    wall.rotation.x = Math.PI / 2;
-                    wall.position.x = til.x - (TILE_COUNT / 2) + 0.5;
-                    wall.position.y = til.y - (TILE_COUNT / 2);
-                    wall.position.z = base + 0.5;
-                    wall.updateMatrix();
-                    tempGeom.merge(wall.geometry, wall.matrix);
-                }
-            }
-
-            if (til.horizontalWall > 0) {
-                var overlayGeom = new THREE.PlaneGeometry(1, 1);
-                var obj = overlay_map[til.horizontalWall + 350];
-                if(obj != null) {
-                    overlayGeom.faces[0].materialIndex = til.horizontalWall + 350;
-                    overlayGeom.faces[1].materialIndex = til.horizontalWall + 350;
-
-                    var wall = new THREE.Mesh(overlayGeom, new THREE.MeshFaceMaterial(materials));
-                    wall.rotation.y = Math.PI / 2;
-                    wall.position.x = til.x - (TILE_COUNT / 2);
-                    wall.position.y = til.y - (TILE_COUNT / 2) + 0.5;
-                    wall.position.z = base + 0.5;
-                    wall.updateMatrix();
-                    tempGeom.merge(wall.geometry, wall.matrix);
-                }
-            }
-
-            if (til.diagonalWall > 0) {
-                var overlayGeom = new THREE.PlaneGeometry(1, 1);
-                var obj = overlay_map[1  + 350];
-                if(obj != null) {
-                    overlayGeom.faces[0].materialIndex = 1  + 350;
-                    overlayGeom.faces[1].materialIndex = 1  + 350;
-
-                    var wall = new THREE.Mesh(overlayGeom, new THREE.MeshFaceMaterial(materials));
-                    wall.rotation.y = Math.PI / 2;
-                    // wall.rotation.x = 20;
-                    wall.position.x = til.x - (TILE_COUNT / 2);
-                    wall.position.y = til.y - (TILE_COUNT / 2) + 0.5;
-                    wall.position.z = base + 0.5;
-                    //  wall.rotation.z = Math.PI / 2;
-                    wall.updateMatrix();
-                    tempGeom.merge(wall.geometry, wall.matrix);
-                }
-            }
-        }
-
-
-
-
-
-        tempMesh.rotation.z = -Math.PI / 2;
-        tempMesh.updateMatrix();
-        geometry.merge(tempMesh.geometry, tempMesh.matrix);
-
-        var tmesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial(materials));
+        var tmesh = drawSector(sectorIndex);
         tmesh.position.set(-(TILE_MESH_SIZE * TILE_COUNT / 2) - 48 * sectX, -(TILE_MESH_SIZE * TILE_COUNT / 2) - 48  * sectY, 0);
         tmesh.rotation.z = -Math.PI / 2;
 
@@ -236,19 +99,156 @@ function updateSectors() {
         masterGeometry.merge(tmesh.geometry, tmesh.matrix);
         sectX++;
 
-        //for (var xp = 0; xp < 48; xp++){
-        //for( var yy = 0; yy < 48; yy++){
-        //var til = ((xp * 48) + yy) * (1);
-        //console.log(xp + "   " + Tiles[til].x + "    " + yy + "     " + Tiles[til].y + "   TEST 4");
-        //}
-        //}
-
     }
 
+    var add = mesh == null;
     mesh = new THREE.Mesh(masterGeometry, new THREE.MeshFaceMaterial(materials));
-    scene.add(mesh);
+   // if(add)
+        scene.add(mesh);
+    //else {
+    //    mesh.updateMatrix();
+    //    mesh.geometry.verticesNeedUpdate = true;
+   // }
+}
 
-    animate();
+function drawSector(sectorIndex) {
+
+    var geometry = new THREE.PlaneGeometry((TILE_MESH_SIZE * TILE_COUNT), (TILE_MESH_SIZE * TILE_COUNT), TILE_COUNT, TILE_COUNT);
+
+    /**
+     *
+     * Tile Elevations
+     *
+     */
+
+    for (var xx = 0; xx < 48; xx++) {
+        for (var yy = 0; yy < 48; yy++) {
+            t = (xx * 48 + yy) + 48 * 48 * sectorIndex;
+            v = (xx * 49 + yy);
+            if (Tiles[t] == null) continue;
+
+            var base = 0;
+            var multi = 0.025;
+            if(Tiles[t].groundElevation < 128) {
+                base -= multi * (128 - Tiles[t].groundElevation);
+            } else {
+                base += multi * Math.abs((128 - Tiles[t].groundElevation));
+            }
+            geometry.vertices[v].z = base;
+        }
+    }
+
+
+
+    /**
+     *
+     * Tile gradients & overlays
+     *
+     */
+    l = geometry.faces.length / 2;
+    for (var i = 0; i < l; i++) {
+        var j = 2 * i;
+        var til = Tiles[i + 48 * 48 * sectorIndex];
+
+        if (til == null)
+            continue;
+
+        if (til.groundTexture > 0) { // tile gradient
+            geometry.faces[j].materialIndex = til.groundTexture + 500;
+            geometry.faces[j + 1].materialIndex = til.groundTexture + 500;
+        }
+
+        var obj = overlay_map[til.groundOverlay];
+        if(obj != null) {
+            geometry.faces[j].materialIndex = til.groundOverlay;
+            geometry.faces[j + 1].materialIndex = til.groundOverlay;
+        }
+    }
+    /**
+     *
+     * Walls
+     *
+     */
+    var tempGeom = new THREE.PlaneGeometry(0, 0);
+    var tempMesh = new THREE.Mesh(tempGeom, new THREE.MeshFaceMaterial(materials));
+    l = geometry.faces.length / 2;
+
+
+
+
+    for (var i = 0; i < l; i++) {
+        var j = 2 * i;
+        var til = Tiles[i + 48 * 48 * sectorIndex];
+        if (til == null)
+            continue;
+
+        var base = 0;
+        var multi = 0.025;
+        if(til.groundElevation < 128) {
+            base -= multi * (128 - til.groundElevation);
+        } else {
+            base += multi * Math.abs((128 - til.groundElevation));
+        }
+        if (til.verticalWall >  0) {
+            var overlayGeom = new THREE.PlaneGeometry(1, 1);
+            var obj = overlay_map[til.verticalWall + 300];
+            if(obj != null) {
+                overlayGeom.faces[0].materialIndex = til.verticalWall + 300;
+                overlayGeom.faces[1].materialIndex = til.verticalWall + 300;
+                var wall = new THREE.Mesh(overlayGeom, new THREE.MeshFaceMaterial(materials));
+                wall.rotation.x = Math.PI / 2;
+                wall.position.x = til.x - (TILE_COUNT / 2) + 0.5;
+                wall.position.y = til.y - (TILE_COUNT / 2);
+                wall.position.z = base + 0.5;
+                wall.updateMatrix();
+                tempGeom.merge(wall.geometry, wall.matrix);
+            }
+        }
+
+        if (til.horizontalWall > 0) {
+            var overlayGeom = new THREE.PlaneGeometry(1, 1);
+            var obj = overlay_map[til.horizontalWall + 350];
+            if(obj != null) {
+                overlayGeom.faces[0].materialIndex = til.horizontalWall + 350;
+                overlayGeom.faces[1].materialIndex = til.horizontalWall + 350;
+
+                var wall = new THREE.Mesh(overlayGeom, new THREE.MeshFaceMaterial(materials));
+                wall.rotation.y = Math.PI / 2;
+                wall.position.x = til.x - (TILE_COUNT / 2);
+                wall.position.y = til.y - (TILE_COUNT / 2) + 0.5;
+                wall.position.z = base + 0.5;
+                wall.updateMatrix();
+                tempGeom.merge(wall.geometry, wall.matrix);
+            }
+        }
+
+        if (til.diagonalWall > 0) {
+            var overlayGeom = new THREE.PlaneGeometry(1, 1);
+            var obj = overlay_map[1  + 350];
+            if(obj != null) {
+                overlayGeom.faces[0].materialIndex = 1  + 350;
+                overlayGeom.faces[1].materialIndex = 1  + 350;
+
+                var wall = new THREE.Mesh(overlayGeom, new THREE.MeshFaceMaterial(materials));
+                wall.rotation.y = Math.PI / 2;
+                // wall.rotation.x = 20;
+                wall.position.x = til.x - (TILE_COUNT / 2);
+                wall.position.y = til.y - (TILE_COUNT / 2) + 0.5;
+                wall.position.z = base + 0.5;
+                //  wall.rotation.z = Math.PI / 2;
+                wall.updateMatrix();
+                tempGeom.merge(wall.geometry, wall.matrix);
+            }
+        }
+    }
+
+    tempMesh.rotation.z = -Math.PI / 2;
+    tempMesh.updateMatrix();
+    geometry.merge(tempMesh.geometry, tempMesh.matrix);
+
+    var tmesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial(materials));
+    return tmesh;
+
 }
 
 function setup() {
@@ -257,15 +257,15 @@ function setup() {
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
     var light = new THREE.AmbientLight(  0x404040 ); // soft white light
-    scene.add( light );
+    // scene.add( light );
     raycaster = new THREE.Raycaster();
     mouse = new THREE.Vector2();
     renderer = new THREE.WebGLRenderer({ alpha: true } );
     renderer.setClearColor( 0x000000 );
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth, window.innerHeight );
-    var axisHelper = new THREE.AxisHelper( 5 );
-    scene.add( axisHelper );
+    //  var axisHelper = new THREE.AxisHelper( 5 );
+    // scene.add( axisHelper );
 
     camera.updateProjectionMatrix();
 
@@ -278,13 +278,14 @@ function setup() {
 
 function animate() {
     stats.begin();
-    stats.end();
+
 
     requestAnimationFrame(animate);
     renderer.render(scene, camera);
 
     if(controls != null)
         controls.update();
+    stats.end();
 }
 
 function html() {
@@ -322,7 +323,7 @@ function html() {
         controls.enablePan = true;
         controls.enableZoom = true;
         controls.update();
-
+        animate();
 
     },false);
 }
@@ -381,8 +382,24 @@ function onDocumentMouseDown( event ) {
         if (tt.x == x && tt.y == y) {
 
             tt.groundElevation = 255;
-            updateSectors();
+           // updateSectors();
             console.log("SUCCESS");
+
+           // scene.remove(mesh);
+            var tmesh = drawSector(sectorIndex);
+            tmesh.position.set(-(TILE_MESH_SIZE * TILE_COUNT / 2) - 48 * tt.sectX, -(TILE_MESH_SIZE * TILE_COUNT / 2) - 48  * tt.sectY, 0);
+            tmesh.rotation.z = -Math.PI / 2;
+
+            tmesh.updateMatrix();
+            masterGeometry.merge(tmesh.geometry, tmesh.matrix);
+            mesh.geometry.computeFaceNormals();
+            mesh.geometry.computeVertexNormals();
+            mesh.geometry.normalsNeedUpdate = true;
+            mesh.geometry.verticesNeedUpdate = true;
+            mesh.geometry.dynamic = true;
+            //scene.add(mesh);
+            animate();
+
 
         }
         else console.log("FAIL");
