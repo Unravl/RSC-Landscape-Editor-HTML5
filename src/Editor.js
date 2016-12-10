@@ -1,9 +1,11 @@
 /**
- * Created by Hayden on 12/1/2016.
+ * Created by Unravel with help from Fish on 12/1/2016.
  */
 
 var TILE_COUNT = 48;
 var TILE_MESH_SIZE = 1;
+var SectorX = 50;
+var SectorY = 47;
 
 var container;
 var camera, scene, renderer, controls;
@@ -12,6 +14,7 @@ var camera, stats;
 var Sectors = new Array();
 var overlay_map = {};
 var Tiles;
+var masterGeometry;
 
 
 function initEditor() {
@@ -28,10 +31,9 @@ function openFile(event) {
     var file = event.target.files[0];
     var jsZip = new JSZip()
     jsZip.loadAsync(file).then(function (zip) {
-        var x=50, y=47;
         var offsets = [[-1, -1],[0, -1],[1, -1], [-1, 0],[0, 0],[1, 0], [-1, 1],[0, 1],[1, 1]];
         for(var i=0; i < offsets.length; i++) {
-            var name = "h0x" + (x + offsets[i][0]) + "y" + (y + offsets[i][1]);
+            var name = "h0x" + (SectorX + offsets[i][0]) + "y" + (SectorY + offsets[i][1]);
             console.error("reading " + name);
             zip.file(name).async('arraybuffer').then(function (fileData) {
                 var view = new DataView(fileData);
@@ -41,14 +43,43 @@ function openFile(event) {
     })
 }
 
-function loadSectors() {
-
+function unpackSectors() {
     Tiles = new Array((TILE_COUNT*TILE_COUNT) * Sectors.length);
+    var sectX = 0;
+    var sectY = 0;
+    for(var s=0; s < Sectors.length; s++) {
+        if (sectX == Math.sqrt(Sectors.length)) {
+            sectX = 0;
+            sectY++;
+        }
+        var sectorIndex = s;
+        var idx = 0;
+        var view = Sectors[s];
+        for (var x = 0; x < TILE_COUNT; x++) {
+            for (var y = 0; y < TILE_COUNT; y++) {
+                var tile = new Tile(sectorIndex, sectX, sectY, x, y, view.getUint8(idx), view.getUint8(idx + 1), view.getUint8(idx + 2), view.getUint8(idx + 3), view.getUint8(idx + 4), view.getUint8(idx + 5), view.getUint32(idx + 6), s);
+
+                Tiles[((x * 48) + y) + 48 * 48 * sectorIndex] = tile;
+                idx += 10;
+            }
+        }
+        sectX++;
+    }
+}
+
+
+
+function updateSectors() {
+
+
+
+    var masterGeometry = new THREE.PlaneGeometry(0 , 0 , 0, 0);
 
     var sectX = 0;
     var sectY = 0;
 
     var masterGeometry = new THREE.PlaneGeometry(0 , 0 , 0, 0);
+
     for(var s=0; s < Sectors.length; s++) {
         if (sectX == Math.sqrt(Sectors.length)) {
             sectX = 0;
@@ -58,24 +89,18 @@ function loadSectors() {
         var idx = 0;
         var view = Sectors[s];
         var geometry = new THREE.PlaneGeometry((TILE_MESH_SIZE * TILE_COUNT), (TILE_MESH_SIZE * TILE_COUNT), TILE_COUNT, TILE_COUNT);
-        for (var x = 0; x < TILE_COUNT; x++) {
-            for (var y = 0; y < TILE_COUNT; y++) {
-                var tile = new Tile(sectorIndex + 1, sectX, sectY, x, y, view.getUint8(idx), view.getUint8(idx + 1), view.getUint8(idx + 2), view.getUint8(idx + 3), view.getUint8(idx + 4), view.getUint8(idx + 5), view.getUint32(idx + 6), s);
-
-                Tiles[((x * 48) + y) * (sectorIndex + 1)] = tile;
-                idx += 10;
-            }
-        }
-
 
         /**
          *
          * Tile Elevations
          *
          */
+
+
+
         for (var xx = 0; xx < 48; xx++) {
             for (var yy = 0; yy < 48; yy++) {
-                t = (xx * 48 + yy) * (sectorIndex + 1);
+                t = (xx * 48 + yy) + 48 * 48 * sectorIndex;
                 v = (xx * 49 + yy);
                 if (Tiles[t] == null) continue;
 
@@ -91,6 +116,7 @@ function loadSectors() {
         }
 
 
+
         /**
          *
          * Tile gradients & overlays
@@ -99,7 +125,7 @@ function loadSectors() {
         l = geometry.faces.length / 2;
         for (var i = 0; i < l; i++) {
             var j = 2 * i;
-            var til = Tiles[i * (sectorIndex + 1)];
+            var til = Tiles[i + 48 * 48 * sectorIndex];
 
             if (til == null)
                 continue;
@@ -124,9 +150,13 @@ function loadSectors() {
         var tempGeom = new THREE.PlaneGeometry(0, 0);
         var tempMesh = new THREE.Mesh(tempGeom, new THREE.MeshFaceMaterial(materials));
         l = geometry.faces.length / 2;
+
+
+
+
         for (var i = 0; i < l; i++) {
             var j = 2 * i;
-            var til = Tiles[i * (sectorIndex + 1)];
+            var til = Tiles[i + 48 * 48 * sectorIndex];
             if (til == null)
                 continue;
 
@@ -179,16 +209,19 @@ function loadSectors() {
 
                     var wall = new THREE.Mesh(overlayGeom, new THREE.MeshFaceMaterial(materials));
                     wall.rotation.y = Math.PI / 2;
-                   // wall.rotation.x = 20;
+                    // wall.rotation.x = 20;
                     wall.position.x = til.x - (TILE_COUNT / 2);
                     wall.position.y = til.y - (TILE_COUNT / 2) + 0.5;
                     wall.position.z = base + 0.5;
-                  //  wall.rotation.z = Math.PI / 2;
+                    //  wall.rotation.z = Math.PI / 2;
                     wall.updateMatrix();
                     tempGeom.merge(wall.geometry, wall.matrix);
                 }
             }
         }
+
+
+
 
 
         tempMesh.rotation.z = -Math.PI / 2;
@@ -202,6 +235,13 @@ function loadSectors() {
         tmesh.updateMatrix();
         masterGeometry.merge(tmesh.geometry, tmesh.matrix);
         sectX++;
+
+        //for (var xp = 0; xp < 48; xp++){
+        //for( var yy = 0; yy < 48; yy++){
+        //var til = ((xp * 48) + yy) * (1);
+        //console.log(xp + "   " + Tiles[til].x + "    " + yy + "     " + Tiles[til].y + "   TEST 4");
+        //}
+        //}
 
     }
 
@@ -230,7 +270,7 @@ function setup() {
     camera.updateProjectionMatrix();
 
     //   controls.update();
-    //document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+    document.addEventListener( 'mousedown', onDocumentMouseDown, false );
     //  document.addEventListener( 'keydown', onDocumentKeyDown, false );
     //  document.addEventListener( 'keyup', onDocumentKeyUp, false );
 
@@ -270,7 +310,8 @@ function html() {
 
     var button = document.getElementById("rendButton");
     button.addEventListener("click",function(e){
-        loadSectors();
+        unpackSectors();
+        updateSectors();
         controls = new THREE.OrbitControls( camera, renderer.domElement );
         controls.enableDamping = true;
         controls.dampingFactor = 0.25;
@@ -300,43 +341,60 @@ function onWindowResize() {
 
 function onDocumentMouseDown( event ) {
 
+    if(event.button != 0)
+        return;
     event.preventDefault();
+    mouse.x = ( event.clientX / renderer.domElement.clientWidth ) * 2 - 1;
+    mouse.y = - ( event.clientY / renderer.domElement.clientHeight ) * 2 + 1;
+    raycaster.setFromCamera( mouse, camera );
 
-    /* mouse.x = ( event.clientX / renderer.domElement.clientWidth ) * 2 - 1;
-     mouse.y = - ( event.clientY / renderer.domElement.clientHeight ) * 2 + 1;
+    var intersects = raycaster.intersectObjects(scene.children );
+    if ( intersects.length > 0 ) {
 
-     raycaster.setFromCamera( mouse, camera );
+        var intersect = intersects[ 0 ];
 
-     var intersects = raycaster.intersectObjects( objects );
+        var x = Math.floor(Math.abs(intersect.point.x));
+        var y = Math.floor(Math.abs(intersect.point.y)) - 1;
 
-     if ( intersects.length > 0 ) {
+        var tempSectX = 0;
+        var tempSectY = 0;
+        while(x >= 48){
+            x -= 48;
+            tempSectX++;
+        }
+        while(y >= 48){
+            y -= 48;
+            tempSectY++;
+        }
 
-     var intersect = intersects[ 0 ];
+        var sectorIndex = 3 * tempSectY + tempSectX;
 
-     if ( isShiftDown ) {
+        //console.log("  X: " + x + "  Y: " + y + "  SX: " + tempSectX + "  SY: " + tempSectY + "  sectorIndex: " + sectorIndex) ;
 
-     if ( intersect.object != plane ) {
+        var tile = ((x * 48) + y) + 48 * 48 * sectorIndex;
+        if(Tiles == null)
+            return;
+        var tt = Tiles[tile];
+        if(tt == null)
+            return;
 
-     scene.remove( intersect.object );
+        if (tt.x == x && tt.y == y) {
 
-     objects.splice( objects.indexOf( intersect.object ), 1 );
+            tt.groundElevation = 255;
+            updateSectors();
+            console.log("SUCCESS");
 
-     }
+        }
+        else console.log("FAIL");
+        // var voxel = new THREE.Mesh( cubeGeometry, cubeMaterial );
+        // voxel.position.copy( intersect.point ).add( intersect.face.normal );
+        // voxel.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
+        //scene.add( voxel );
 
-     } else {
+        //objects.push( voxel );
 
-     var voxel = new THREE.Mesh( cubeGeometry, cubeMaterial );
-     voxel.position.copy( intersect.point ).add( intersect.face.normal );
-     voxel.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
-     scene.add( voxel );
 
-     objects.push( voxel );
-
-     }
-
-     animate();
-
-     }*/
+    }
 
 }
 
