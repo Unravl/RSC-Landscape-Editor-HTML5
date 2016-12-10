@@ -5,4 +5,4 @@ You will need to host these files under a web server, due to HTML5's permissions
 
 ![alt tag](http://i.imgur.com/pLEKwr6.png)
 
-Credits to <Fish>< for helping.
+Credits to Fish for helping.
