@@ -2,8 +2,6 @@
  * Created by Hayden on 12/1/2016.
  */
 
-
-
 var TILE_COUNT = 48;
 var TILE_MESH_SIZE = 1;
 
@@ -13,6 +11,8 @@ var mouse, raycaster, isShiftDown = false;
 var camera, stats;
 var Sectors = new Array();
 var overlay_map = {};
+var Tiles;
+
 
 function initEditor() {
     try {
@@ -43,7 +43,7 @@ function openFile(event) {
 
 function loadSectors() {
 
-    var Tiles = new Array((TILE_COUNT*TILE_COUNT) * Sectors.length);
+    Tiles = new Array((TILE_COUNT*TILE_COUNT) * Sectors.length);
 
     var sectX = 0;
     var sectY = 0;
@@ -165,6 +165,25 @@ function loadSectors() {
                     wall.position.x = til.x - (TILE_COUNT / 2);
                     wall.position.y = til.y - (TILE_COUNT / 2) + 0.5;
                     wall.position.z = base + 0.5;
+                    wall.updateMatrix();
+                    tempGeom.merge(wall.geometry, wall.matrix);
+                }
+            }
+
+            if (til.diagonalWall > 0) {
+                var overlayGeom = new THREE.PlaneGeometry(1, 1);
+                var obj = overlay_map[1  + 350];
+                if(obj != null) {
+                    overlayGeom.faces[0].materialIndex = 1  + 350;
+                    overlayGeom.faces[1].materialIndex = 1  + 350;
+
+                    var wall = new THREE.Mesh(overlayGeom, new THREE.MeshFaceMaterial(materials));
+                    wall.rotation.y = Math.PI / 2;
+                   // wall.rotation.x = 20;
+                    wall.position.x = til.x - (TILE_COUNT / 2);
+                    wall.position.y = til.y - (TILE_COUNT / 2) + 0.5;
+                    wall.position.z = base + 0.5;
+                  //  wall.rotation.z = Math.PI / 2;
                     wall.updateMatrix();
                     tempGeom.merge(wall.geometry, wall.matrix);
                 }
