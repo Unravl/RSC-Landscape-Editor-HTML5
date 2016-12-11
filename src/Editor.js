@@ -96,7 +96,7 @@ function unpackSectors() {
         var view = Sectors[s];
         for (var x = 0; x < TILE_COUNT; x++) {
             for (var y = 0; y < TILE_COUNT; y++) {
-                var tile = new Tile(sectorIndex, sectX, sectY, x, y, view.getUint8(idx), view.getUint8(idx + 1), view.getUint8(idx + 2), view.getUint8(idx + 3), view.getUint8(idx + 4), view.getUint8(idx + 5), view.getUint32(idx + 6), s);
+                var tile = new Tile(sectorIndex, sectX, sectY, x, y, view.getUint8(idx), view.getUint8(idx + 1), view.getUint8(idx + 2), view.getUint8(idx + 3), view.getUint8(idx + 4), view.getUint8(idx + 5), view.getUint32(idx + 6), s, (SectorX + offsets[sectorIndex][0]),(SectorY + offsets[sectorIndex][1]) );
 
                 Tiles[((x * 48) + y) + 48 * 48 * sectorIndex] = tile;
                 idx += 10;
@@ -439,6 +439,9 @@ function onDocumentMouseDown( event ) {
 		*/
 		var sectName = "h0x" + (SectorX + offsets[tt.sector][0]) + "y" + (SectorY + offsets[tt.sector][1]);
 			guiItems.localXY = tt.x + ", " + tt.y;
+			var rscX = ((tt.absoluteSectorX - 48) * 48) + tt.x//tt.x + (48 * (SectorX - 48));
+            var rscY = ((((tt.absoluteSectorY - 36) * 48) + tt.y + 96) - 144) + (0 * 944) + 48 - 48;//tt.y + (48 * (SectorY - 36)) - 143 - 48;
+            guiItems.rscXY = rscX + ", " + rscY;
 			guiItems.sectorIdx = tt.sector;
 			guiItems.sectorName = sectName;
 			guiItems.tileIdx = tile;
