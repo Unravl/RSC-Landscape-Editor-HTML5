@@ -4,7 +4,7 @@
 
 var TILE_COUNT = 48;
 var TILE_MESH_SIZE = 1;
-var SectorX = 50;
+var SectorX = 53;
 var SectorY = 47;
 
 var container;
@@ -17,41 +17,43 @@ var overlay_map = {};
 var Tiles;
 var mesh;
 var masterGeometry;
-   var offsets = [[-1, -1],[0, -1],[1, -1], [-1, 0],[0, 0],[1, 0], [-1, 1],[0, 1],[1, 1]];
+var offsets = [[-1, -1],[0, -1],[1, -1], [-1, 0],[0, 0],[1, 0], [-1, 1],[0, 1],[1, 1]];
 var gui = new dat.GUI();
-	var guiItems = 
-	{
-		localXY: "0, 0",
-		sectorName: "TODO",
-		sectorIdx: 0,
-		tileIdx: 0,
-		rscXY: "TODO",
-		tile_elevation: 0,
-		tile_texture: 0,
-		tile_overlay: 0,
-		tile_horizontal: 0,
-		tile_vertical: 0,
-		tile_diagonal: 0,
-		tile_roof: 0
-		
-	};
+var guiItems =
+    {
+        localXY: "0, 0",
+        sectorName: "0",
+        sectorIdx: 0,
+        tileIdx: 0,
+        rscXY: "0",
+        tile_elevation: 0,
+        tile_texture: 0,
+        tile_overlay: 0,
+        tile_horizontal: 0,
+        tile_vertical: 0,
+        tile_diagonal: 0,
+        tile_roof: 0
+
+    };
+
+
 function loadGui() {
-	
+
     selected = gui.addFolder('Selected Tile');
-	selected.add(guiItems, 'rscXY').name("RSC XY").listen();
-	selected.add(guiItems, 'localXY').name("Local XY").listen();
-	selected.add(guiItems, 'sectorName').name("Sector Name").listen();
-	selected.add(guiItems, 'sectorIdx').name("Sector Index").listen();
-	selected.add(guiItems, 'tileIdx').name("Tile Index").listen();
-	selected.add(guiItems, 'tile_overlay').name("Overlay").listen();
-	selected.add(guiItems, 'tile_texture').name("Texture").listen();
-	selected.add(guiItems, 'tile_elevation').name("Elevation").listen();
-	selected.add(guiItems, 'tile_horizontal').name("Horizontal Wall").listen();
-	selected.add(guiItems, 'tile_vertical').name("Vertical Wall").listen();
-	selected.add(guiItems, 'tile_diagonal').name("Diagonal").listen();
-	selected.add(guiItems, 'tile_roof').name("Roof").listen();
-	//selected.open();
-	gui.open();
+    selected.add(guiItems, 'rscXY').name("RSC XY").listen();
+    selected.add(guiItems, 'localXY').name("Local XY").listen();
+    selected.add(guiItems, 'sectorName').name("Sector Name").listen();
+    selected.add(guiItems, 'sectorIdx').name("Sector Index").listen();
+    selected.add(guiItems, 'tileIdx').name("Tile Index").listen();
+    selected.add(guiItems, 'tile_overlay').name("Overlay").listen();
+    selected.add(guiItems, 'tile_texture').name("Texture").listen();
+    selected.add(guiItems, 'tile_elevation').name("Elevation").listen();
+    selected.add(guiItems, 'tile_horizontal').name("Horizontal Wall").listen();
+    selected.add(guiItems, 'tile_vertical').name("Vertical Wall").listen();
+    selected.add(guiItems, 'tile_diagonal').name("Diagonal").listen();
+    selected.add(guiItems, 'tile_roof').name("Roof").listen();
+    //selected.open();
+    gui.open();
 }
 
 
@@ -59,7 +61,7 @@ function initEditor() {
     try {
         setup();
         html();
-		loadGui();
+        loadGui();
         animate();
     } catch(err) {
         alert(err);
@@ -70,7 +72,7 @@ function openFile(event) {
     var file = event.target.files[0];
     var jsZip = new JSZip()
     jsZip.loadAsync(file).then(function (zip) {
-     
+
         for(var i=0; i < offsets.length; i++) {
             var name = "h0x" + (SectorX + offsets[i][0]) + "y" + (SectorY + offsets[i][1]);
             console.error("reading " + name);
@@ -141,12 +143,12 @@ function updateSectors() {
 
     var add = mesh == null;
     mesh = new THREE.Mesh(masterGeometry, new THREE.MeshFaceMaterial(materials));
-   // if(add)
-        scene.add(mesh);
+    // if(add)
+    scene.add(mesh);
     //else {
     //    mesh.updateMatrix();
     //    mesh.geometry.verticesNeedUpdate = true;
-   // }
+    // }
 }
 
 function drawSector(sectorIndex) {
@@ -419,54 +421,54 @@ function onDocumentMouseDown( event ) {
 
         if (tt.x == x && tt.y == y) {
 
-			selected.open();
+            selected.open();
             tt.groundElevation = 255;
-           // updateSectors();
+            // updateSectors();
             console.log("SUCCESS");
-/**
-		localXY: "0, 0",
-		sectorName: "null",
-		sectorIdx: 0,
-		tileIdx: 0,
-		rscXY: "0, 0",
-		tile_elevation: 0,
-		tile_texture: 0,
-		tile_overlay: 0,
-		tile_horizontal: 0,
-		tile_vertical: 0,
-		tile_diagonal: 0,
-		tile_roof: 0
-		*/
-		var sectName = "h0x" + (SectorX + offsets[tt.sector][0]) + "y" + (SectorY + offsets[tt.sector][1]);
-			guiItems.localXY = tt.x + ", " + tt.y;
-			var rscX = ((tt.absoluteSectorX - 48) * 48) + tt.x//tt.x + (48 * (SectorX - 48));
+            /**
+             localXY: "0, 0",
+             sectorName: "null",
+             sectorIdx: 0,
+             tileIdx: 0,
+             rscXY: "0, 0",
+             tile_elevation: 0,
+             tile_texture: 0,
+             tile_overlay: 0,
+             tile_horizontal: 0,
+             tile_vertical: 0,
+             tile_diagonal: 0,
+             tile_roof: 0
+             */
+            var sectName = "h0x" + (SectorX + offsets[tt.sector][0]) + "y" + (SectorY + offsets[tt.sector][1]);
+            guiItems.localXY = tt.x + ", " + tt.y;
+            var rscX = ((tt.absoluteSectorX - 48) * 48) + tt.x//tt.x + (48 * (SectorX - 48));
             var rscY = ((((tt.absoluteSectorY - 36) * 48) + tt.y + 96) - 144) + (0 * 944) + 48 - 48;//tt.y + (48 * (SectorY - 36)) - 143 - 48;
             guiItems.rscXY = rscX + ", " + rscY;
-			guiItems.sectorIdx = tt.sector;
-			guiItems.sectorName = sectName;
-			guiItems.tileIdx = tile;
-			guiItems.tile_elevation = tt.groundElevation;
-			guiItems.tile_overlay = tt.groundOverlay;
-			guiItems.tile_texture = tt.groundTexture;
-			guiItems.tile_horizontal = tt.horizontalWall;
-			guiItems.tile_vertical = tt.verticalWall;
-			guiItems.tile_diagonal = tt.diagonalWall;
-			guiItems.tile_roof = tt.roofTexture;
-			
-          /* // scene.remove(mesh);
-            var tmesh = drawSector(sectorIndex);
-            tmesh.position.set(-(TILE_MESH_SIZE * TILE_COUNT / 2) - 48 * tt.sectX, -(TILE_MESH_SIZE * TILE_COUNT / 2) - 48  * tt.sectY, 0);
-            tmesh.rotation.z = -Math.PI / 2;
+            guiItems.sectorIdx = tt.sector;
+            guiItems.sectorName = sectName;
+            guiItems.tileIdx = tile;
+            guiItems.tile_elevation = tt.groundElevation;
+            guiItems.tile_overlay = tt.groundOverlay;
+            guiItems.tile_texture = tt.groundTexture;
+            guiItems.tile_horizontal = tt.horizontalWall;
+            guiItems.tile_vertical = tt.verticalWall;
+            guiItems.tile_diagonal = tt.diagonalWall;
+            guiItems.tile_roof = tt.roofTexture;
 
-            tmesh.updateMatrix();
-            masterGeometry.merge(tmesh.geometry, tmesh.matrix);
-            mesh.geometry.computeFaceNormals();
-            mesh.geometry.computeVertexNormals();
-            mesh.geometry.normalsNeedUpdate = true;
-            mesh.geometry.verticesNeedUpdate = true;
-            mesh.geometry.dynamic = true;
-            //scene.add(mesh);
-            animate();*/
+            /* // scene.remove(mesh);
+             var tmesh = drawSector(sectorIndex);
+             tmesh.position.set(-(TILE_MESH_SIZE * TILE_COUNT / 2) - 48 * tt.sectX, -(TILE_MESH_SIZE * TILE_COUNT / 2) - 48  * tt.sectY, 0);
+             tmesh.rotation.z = -Math.PI / 2;
+
+             tmesh.updateMatrix();
+             masterGeometry.merge(tmesh.geometry, tmesh.matrix);
+             mesh.geometry.computeFaceNormals();
+             mesh.geometry.computeVertexNormals();
+             mesh.geometry.normalsNeedUpdate = true;
+             mesh.geometry.verticesNeedUpdate = true;
+             mesh.geometry.dynamic = true;
+             //scene.add(mesh);
+             animate();*/
 
 
         }

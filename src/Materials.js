@@ -42,13 +42,28 @@ function prepMaterials() {
     overlay_map[300 + 128] = new THREE.MeshBasicMaterial({map: new THREE.ImageUtils.loadTexture('img/3230.png'), side: THREE.DoubleSide, transparent: true});
     overlay_map[300 + 15] = new THREE.MeshBasicMaterial({map: new THREE.ImageUtils.loadTexture('img/3241.png'), side: THREE.DoubleSide});
     overlay_map[300 + 16] = new THREE.MeshBasicMaterial({map: new THREE.ImageUtils.loadTexture('img/3241w.png'), side: THREE.DoubleSide});
+    overlay_map[300 + 6] = new THREE.MeshBasicMaterial({map: new THREE.ImageUtils.loadTexture('img/6.png'), side: THREE.DoubleSide, transparent: true});
+    overlay_map[300 + 7] = new THREE.MeshBasicMaterial({map: new THREE.ImageUtils.loadTexture('img/7.bmp'), side: THREE.DoubleSide});
+    overlay_map[300 + 14] = new THREE.MeshBasicMaterial({map: new THREE.ImageUtils.loadTexture('img/14.png'), side: THREE.DoubleSide});
+    overlay_map[300 + 35] = new THREE.MeshBasicMaterial({map: new THREE.ImageUtils.loadTexture('img/35.bmp'), side: THREE.DoubleSide});
+    overlay_map[300 + 19] = new THREE.MeshBasicMaterial({map: new THREE.ImageUtils.loadTexture('img/3243.png'), side: THREE.DoubleSide});
+    overlay_map[300 + 42] = new THREE.MeshBasicMaterial({map: new THREE.ImageUtils.loadTexture('img/42.png'), side: THREE.DoubleSide, transparent: true});
+    overlay_map[300 + 11] = new THREE.MeshBasicMaterial({map: new THREE.ImageUtils.loadTexture('img/11.png'), side: THREE.DoubleSide, transparent: true});
+
 
     // horizontal walls start at 350
     overlay_map[350 + 1] = new THREE.MeshBasicMaterial({map: new THREE.ImageUtils.loadTexture('img/3222v.png'), side: THREE.DoubleSide});
+    overlay_map[300 + 11] = new THREE.MeshBasicMaterial({map: new THREE.ImageUtils.loadTexture('img/11v.png'), side: THREE.DoubleSide, transparent: true});
+    overlay_map[350 + 6] = new THREE.MeshBasicMaterial({map: new THREE.ImageUtils.loadTexture('img/6v.png'), side: THREE.DoubleSide, transparent: true});
+    overlay_map[350 + 7] = new THREE.MeshBasicMaterial({map: new THREE.ImageUtils.loadTexture('img/7v.bmp'), side: THREE.DoubleSide});
+    overlay_map[350 + 14] = new THREE.MeshBasicMaterial({map: new THREE.ImageUtils.loadTexture('img/14v.png'), side: THREE.DoubleSide});
+    overlay_map[350 + 35] = new THREE.MeshBasicMaterial({map: new THREE.ImageUtils.loadTexture('img/35v.bmp'), side: THREE.DoubleSide});
+    overlay_map[350 + 19] = new THREE.MeshBasicMaterial({map: new THREE.ImageUtils.loadTexture('img/3243v.png'), side: THREE.DoubleSide});
     overlay_map[350 + 8] = new THREE.MeshBasicMaterial({map: new THREE.ImageUtils.loadTexture('img/3222v.png'), side: THREE.DoubleSide});
     overlay_map[350 + 4] = new THREE.MeshBasicMaterial({map: new THREE.ImageUtils.loadTexture('img/3222vw.png'), side: THREE.DoubleSide});
     overlay_map[350 + 5] = new THREE.MeshBasicMaterial({map: new THREE.ImageUtils.loadTexture('img/3230v.png'), side: THREE.DoubleSide, transparent: true});
     overlay_map[350 + 128] = new THREE.MeshBasicMaterial({map: new THREE.ImageUtils.loadTexture('img/3230v.png'), side: THREE.DoubleSide, transparent: true});
+    overlay_map[350 + 42] = new THREE.MeshBasicMaterial({map: new THREE.ImageUtils.loadTexture('img/42v.png'), side: THREE.DoubleSide, transparent: true});
     overlay_map[350 + 15] = new THREE.MeshBasicMaterial({map: new THREE.ImageUtils.loadTexture('img/3241v.png'), side: THREE.DoubleSide});
     overlay_map[350 + 16] = new THREE.MeshBasicMaterial({map: new THREE.ImageUtils.loadTexture('img/3241vw.png'), side: THREE.DoubleSide});
 
