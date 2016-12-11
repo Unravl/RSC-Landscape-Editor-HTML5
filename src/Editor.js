@@ -12,16 +12,54 @@ var camera, scene, renderer, controls;
 var mouse, raycaster, isShiftDown = false;
 var camera, stats;
 var Sectors = new Array();
+var selected;
 var overlay_map = {};
 var Tiles;
 var mesh;
 var masterGeometry;
+   var offsets = [[-1, -1],[0, -1],[1, -1], [-1, 0],[0, 0],[1, 0], [-1, 1],[0, 1],[1, 1]];
+var gui = new dat.GUI();
+	var guiItems = 
+	{
+		localXY: "0, 0",
+		sectorName: "TODO",
+		sectorIdx: 0,
+		tileIdx: 0,
+		rscXY: "TODO",
+		tile_elevation: 0,
+		tile_texture: 0,
+		tile_overlay: 0,
+		tile_horizontal: 0,
+		tile_vertical: 0,
+		tile_diagonal: 0,
+		tile_roof: 0
+		
+	};
+function loadGui() {
+	
+    selected = gui.addFolder('Selected Tile');
+	selected.add(guiItems, 'rscXY').name("RSC XY").listen();
+	selected.add(guiItems, 'localXY').name("Local XY").listen();
+	selected.add(guiItems, 'sectorName').name("Sector Name").listen();
+	selected.add(guiItems, 'sectorIdx').name("Sector Index").listen();
+	selected.add(guiItems, 'tileIdx').name("Tile Index").listen();
+	selected.add(guiItems, 'tile_overlay').name("Overlay").listen();
+	selected.add(guiItems, 'tile_texture').name("Texture").listen();
+	selected.add(guiItems, 'tile_elevation').name("Elevation").listen();
+	selected.add(guiItems, 'tile_horizontal').name("Horizontal Wall").listen();
+	selected.add(guiItems, 'tile_vertical').name("Vertical Wall").listen();
+	selected.add(guiItems, 'tile_diagonal').name("Diagonal").listen();
+	selected.add(guiItems, 'tile_roof').name("Roof").listen();
+	//selected.open();
+	gui.open();
+}
 
 
 function initEditor() {
     try {
         setup();
         html();
+		loadGui();
         animate();
     } catch(err) {
         alert(err);
@@ -32,7 +70,7 @@ function openFile(event) {
     var file = event.target.files[0];
     var jsZip = new JSZip()
     jsZip.loadAsync(file).then(function (zip) {
-        var offsets = [[-1, -1],[0, -1],[1, -1], [-1, 0],[0, 0],[1, 0], [-1, 1],[0, 1],[1, 1]];
+     
         for(var i=0; i < offsets.length; i++) {
             var name = "h0x" + (SectorX + offsets[i][0]) + "y" + (SectorY + offsets[i][1]);
             console.error("reading " + name);
@@ -381,11 +419,38 @@ function onDocumentMouseDown( event ) {
 
         if (tt.x == x && tt.y == y) {
 
+			selected.open();
             tt.groundElevation = 255;
            // updateSectors();
             console.log("SUCCESS");
-
-           // scene.remove(mesh);
+/**
+		localXY: "0, 0",
+		sectorName: "null",
+		sectorIdx: 0,
+		tileIdx: 0,
+		rscXY: "0, 0",
+		tile_elevation: 0,
+		tile_texture: 0,
+		tile_overlay: 0,
+		tile_horizontal: 0,
+		tile_vertical: 0,
+		tile_diagonal: 0,
+		tile_roof: 0
+		*/
+		var sectName = "h0x" + (SectorX + offsets[tt.sector][0]) + "y" + (SectorY + offsets[tt.sector][1]);
+			guiItems.localXY = tt.x + ", " + tt.y;
+			guiItems.sectorIdx = tt.sector;
+			guiItems.sectorName = sectName;
+			guiItems.tileIdx = tile;
+			guiItems.tile_elevation = tt.groundElevation;
+			guiItems.tile_overlay = tt.groundOverlay;
+			guiItems.tile_texture = tt.groundTexture;
+			guiItems.tile_horizontal = tt.horizontalWall;
+			guiItems.tile_vertical = tt.verticalWall;
+			guiItems.tile_diagonal = tt.diagonalWall;
+			guiItems.tile_roof = tt.roofTexture;
+			
+          /* // scene.remove(mesh);
             var tmesh = drawSector(sectorIndex);
             tmesh.position.set(-(TILE_MESH_SIZE * TILE_COUNT / 2) - 48 * tt.sectX, -(TILE_MESH_SIZE * TILE_COUNT / 2) - 48  * tt.sectY, 0);
             tmesh.rotation.z = -Math.PI / 2;
@@ -398,7 +463,7 @@ function onDocumentMouseDown( event ) {
             mesh.geometry.verticesNeedUpdate = true;
             mesh.geometry.dynamic = true;
             //scene.add(mesh);
-            animate();
+            animate();*/
 
 
         }
