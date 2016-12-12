@@ -61,7 +61,7 @@ function initEditor() {
     try {
         setup();
         html();
-        loadGui();
+     //   loadGui();
         animate();
     } catch(err) {
         alert(err);
@@ -82,8 +82,34 @@ function openFile(event) {
             })
         }
     })
+	var timer = setInterval(load_timer, 500);
+	function load_timer() {
+	if(sectorsLoaded) {
+		clearInterval(timer);
+		sectorsLoaded = false;
+		unpackSectors();
+        updateSectors();
+		camera.position.set(-20,0,200);
+		camera.rotation.set(-200, 0, 0);
+        controls = new THREE.OrbitControls( camera, renderer.domElement );
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.25;
+        controls.zoomSpeed = 0.5;
+		//controls.target..x -= 100;
+        //controls.target.set(50, (48/2*3), -100);
+        controls.enabled = false;
+        controls.enabled = true;
+        controls.enablePan = true;
+        controls.enableZoom = true;
+        controls.update();
+        animate();
+	}
 }
 
+}
+
+
+var sectorsLoaded = false;
 function unpackSectors() {
     Tiles = new Array((TILE_COUNT*TILE_COUNT) * Sectors.length);
     var sectX = 0;
@@ -106,6 +132,7 @@ function unpackSectors() {
         }
         sectX++;
     }
+	sectorsLoaded = true;
 }
 
 var masterGeometry;
@@ -302,6 +329,7 @@ function setup() {
     mouse = new THREE.Vector2();
     renderer = new THREE.WebGLRenderer({ alpha: true } );
     renderer.setClearColor( 0x000000 );
+	scene.background = new THREE.Color( 0xaaaaaa );
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth, window.innerHeight );
     //  var axisHelper = new THREE.AxisHelper( 5 );
@@ -331,10 +359,10 @@ function animate() {
 function html() {
     stats = new Stats();
     stats.showPanel( 0 );
-    document.body.appendChild( stats.dom );
-    var top = document.createElement('div');
-    top.innerHTML = '<input type="file" onchange="openFile(event)" > <button id="rendButton">Render</button><br><br>';
-    document.body.appendChild(top);
+   // document.body.appendChild( stats.dom );
+    //var top = document.createElement('div');
+    //top.innerHTML = '<input type="file" onchange="openFile(event)" > <button id="rendButton">Render</button><br><br>';
+    //document.body.appendChild(top);
     container = document.createElement('div');
     document.body.appendChild(container);
     var info = document.createElement('div');
@@ -344,12 +372,12 @@ function html() {
     info.style.textAlign = 'center';
     // info.innerHTML = '<input type="file" onchange="openFile(event)" ><br><br>';
 
-    container.appendChild(info);
+    //container.appendChild(info);
     container.appendChild(renderer.domElement);
     window.addEventListener( 'resize', onWindowResize, false );
 
 
-    var button = document.getElementById("rendButton");
+  /*  var button = document.getElementById("rendButton");
     button.addEventListener("click",function(e){
         unpackSectors();
         updateSectors();
@@ -365,7 +393,7 @@ function html() {
         controls.update();
         animate();
 
-    },false);
+    },false);*/
 }
 
 function onWindowResize() {
@@ -421,7 +449,7 @@ function onDocumentMouseDown( event ) {
 
         if (tt.x == x && tt.y == y) {
 
-            selected.open();
+           // selected.open();
             tt.groundElevation = 255;
             // updateSectors();
             console.log("SUCCESS");
