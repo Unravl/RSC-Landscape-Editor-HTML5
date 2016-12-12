@@ -9,15 +9,18 @@
 <body>
 
 
-		<link href="css/main.css" rel="stylesheet" />
-		<link id="theme" href="css/light.css" rel="stylesheet" />
+<link href="css/main.css" rel="stylesheet" />
+<link id="theme" href="css/light.css" rel="stylesheet" />
 
-				<script src="js/ui.js"></script>
-		<script src="js/ui.three.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/ui.three.js"></script>
 <script src="js/three.js"></script>
 <script src="src/ui/Menubar.js"></script>
 <script src="src/ui/Toolbar.js"></script>
 <script src="src/ui/Sidebar.js"></script>
+<script src="src/ui/Sidebar.ViewMode.js"></script>
+<script src="src/ui/Sidebar.EditMode.js"></script>
+<script src="src/ui/Sidebar.Settings.js"></script>
 <script src="src/ui/Menubar.File.js"></script>
 <script src="js/dat.gui.js"></script>
 <script src="js/Projector.js"></script>
@@ -37,13 +40,13 @@
 
 
 <script>
-var toolbar = new Toolbar( null );
-			document.body.appendChild( toolbar.dom );
-			var sidebar = new Sidebar( null );
-			document.body.appendChild( sidebar.dom );
-var menubar = new Menubar( null );
-document.body.appendChild( menubar.dom );
-initEditor();
+    var toolbar = new Toolbar( null );
+    document.body.appendChild( toolbar.dom );
+    var sidebar = new Sidebar( null );
+    document.body.appendChild( sidebar.dom );
+    var menubar = new Menubar( null );
+    document.body.appendChild( menubar.dom );
+    initEditor();
 </script>
 
 </body>

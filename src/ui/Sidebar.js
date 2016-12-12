@@ -26,14 +26,19 @@ var Sidebar = function ( editor ) {
 
 	//
 
-	/*var scene = new UI.Span().add(
-		new Sidebar.Scene( editor ),
-		new Sidebar.Properties( editor ),
-		new Sidebar.Animation( editor ),
-		new Sidebar.Script( editor )
+	var view = new UI.Span().add(
+		new Sidebar.ViewMode(null)
 	);
-	container.add( scene );
-
+    var edit = new UI.Span().add(
+        new Sidebar.EditMode(null)
+    );
+    var settings = new UI.Span().add(
+        new Sidebar.Settings(null)
+    );
+	container.add( view );
+    container.add( edit );
+    container.add( settings );
+/*
 	var project = new UI.Span().add(
 		new Sidebar.Project( editor )
 	);
@@ -49,29 +54,29 @@ var Sidebar = function ( editor ) {
 
 	function select( section ) {
 
-		/*sceneTab.setClass( '' );
-		projectTab.setClass( '' );
+		viewTab.setClass( '' );
+		editTab.setClass( '' );
 		settingsTab.setClass( '' );
 
-		scene.setDisplay( 'none' );
-		project.setDisplay( 'none' );
+		view.setDisplay( 'none' );
+		edit.setDisplay( 'none' );
 		settings.setDisplay( 'none' );
 
 		switch ( section ) {
-			case 'SCENE':
-				sceneTab.setClass( 'selected' );
-				scene.setDisplay( '' );
+			case 'VIEW MODE':
+				viewTab.setClass( 'selected' );
+				view.setDisplay( '' );
 				break;
-			case 'PROJECT':
-				projectTab.setClass( 'selected' );
-				project.setDisplay( '' );
+			case 'EDIT MODE':
+				editTab.setClass( 'selected' );
+				edit.setDisplay( '' );
 				break;
 			case 'SETTINGS':
 				settingsTab.setClass( 'selected' );
 				settings.setDisplay( '' );
 				break;
 		}
-		*/
+
 
 	}
 

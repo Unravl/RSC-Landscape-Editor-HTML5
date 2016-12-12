@@ -61,7 +61,7 @@ function initEditor() {
     try {
         setup();
         html();
-     //   loadGui();
+        //   loadGui();
         animate();
     } catch(err) {
         alert(err);
@@ -82,29 +82,30 @@ function openFile(event) {
             })
         }
     })
-	var timer = setInterval(load_timer, 500);
-	function load_timer() {
-	if(sectorsLoaded) {
-		clearInterval(timer);
-		sectorsLoaded = false;
-		unpackSectors();
-        updateSectors();
-		camera.position.set(-20,0,200);
-		camera.rotation.set(-200, 0, 0);
-        controls = new THREE.OrbitControls( camera, renderer.domElement );
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.25;
-        controls.zoomSpeed = 0.5;
-		//controls.target..x -= 100;
-        //controls.target.set(50, (48/2*3), -100);
-        controls.enabled = false;
-        controls.enabled = true;
-        controls.enablePan = true;
-        controls.enableZoom = true;
-        controls.update();
-        animate();
-	}
-}
+    var timer = setInterval(load_timer, 500);
+    function load_timer() {
+        if(sectorsLoaded) {
+            clearInterval(timer);
+            sectorsLoaded = false;
+            unpackSectors();
+            updateSectors();
+            camera.position.set(0,0,200);
+            //camera.target.set(0, 0, 0);
+            //	camera.rotation.set(-200, 0, 0);
+            controls = new THREE.OrbitControls( camera, renderer.domElement );
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.25;
+            controls.zoomSpeed = 0.5;
+            //controls.target..x -= 100;
+            //controls.target.set(50, (48/2*3), -100);
+            controls.enabled = false;
+            controls.enabled = true;
+            controls.enablePan = true;
+            controls.enableZoom = true;
+            controls.update();
+            animate();
+        }
+    }
 
 }
 
@@ -132,7 +133,7 @@ function unpackSectors() {
         }
         sectX++;
     }
-	sectorsLoaded = true;
+    sectorsLoaded = true;
 }
 
 var masterGeometry;
@@ -329,7 +330,7 @@ function setup() {
     mouse = new THREE.Vector2();
     renderer = new THREE.WebGLRenderer({ alpha: true } );
     renderer.setClearColor( 0x000000 );
-	scene.background = new THREE.Color( 0xaaaaaa );
+    scene.background = new THREE.Color( 0xaaaaaa );
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth, window.innerHeight );
     //  var axisHelper = new THREE.AxisHelper( 5 );
@@ -359,7 +360,7 @@ function animate() {
 function html() {
     stats = new Stats();
     stats.showPanel( 0 );
-   // document.body.appendChild( stats.dom );
+    // document.body.appendChild( stats.dom );
     //var top = document.createElement('div');
     //top.innerHTML = '<input type="file" onchange="openFile(event)" > <button id="rendButton">Render</button><br><br>';
     //document.body.appendChild(top);
@@ -377,23 +378,23 @@ function html() {
     window.addEventListener( 'resize', onWindowResize, false );
 
 
-  /*  var button = document.getElementById("rendButton");
-    button.addEventListener("click",function(e){
-        unpackSectors();
-        updateSectors();
-        controls = new THREE.OrbitControls( camera, renderer.domElement );
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.25;
-        controls.zoomSpeed = 0.5;
-        camera.position.set(0, 0, 200);
-        controls.enabled = false;
-        controls.enabled = true;
-        controls.enablePan = true;
-        controls.enableZoom = true;
-        controls.update();
-        animate();
+    /*  var button = document.getElementById("rendButton");
+     button.addEventListener("click",function(e){
+     unpackSectors();
+     updateSectors();
+     controls = new THREE.OrbitControls( camera, renderer.domElement );
+     controls.enableDamping = true;
+     controls.dampingFactor = 0.25;
+     controls.zoomSpeed = 0.5;
+     camera.position.set(0, 0, 200);
+     controls.enabled = false;
+     controls.enabled = true;
+     controls.enablePan = true;
+     controls.enableZoom = true;
+     controls.update();
+     animate();
 
-    },false);*/
+     },false);*/
 }
 
 function onWindowResize() {
@@ -449,10 +450,11 @@ function onDocumentMouseDown( event ) {
 
         if (tt.x == x && tt.y == y) {
 
-           // selected.open();
+            // selected.open();
             tt.groundElevation = 255;
             // updateSectors();
             console.log("SUCCESS");
+
             /**
              localXY: "0, 0",
              sectorName: "null",
@@ -472,16 +474,17 @@ function onDocumentMouseDown( event ) {
             var rscX = ((tt.absoluteSectorX - 48) * 48) + tt.x//tt.x + (48 * (SectorX - 48));
             var rscY = ((((tt.absoluteSectorY - 36) * 48) + tt.y + 96) - 144) + (0 * 944) + 48 - 48;//tt.y + (48 * (SectorY - 36)) - 143 - 48;
             guiItems.rscXY = rscX + ", " + rscY;
-            guiItems.sectorIdx = tt.sector;
-            guiItems.sectorName = sectName;
-            guiItems.tileIdx = tile;
-            guiItems.tile_elevation = tt.groundElevation;
-            guiItems.tile_overlay = tt.groundOverlay;
-            guiItems.tile_texture = tt.groundTexture;
-            guiItems.tile_horizontal = tt.horizontalWall;
-            guiItems.tile_vertical = tt.verticalWall;
-            guiItems.tile_diagonal = tt.diagonalWall;
-            guiItems.tile_roof = tt.roofTexture;
+            ui_coords.setValue("\nRSC Coords: " + rscX + ", " + rscY);
+            sectorIdx.setValue("Sector Index" + tt.sector);
+            sectorName.setValue("Sector Name" + sectName);
+            tileIdx.setValue("Tile Index" + tile);
+            tile_elevation.setValue("Elevation" + tt.groundElevation);
+            tile_overlay.setValue("Overlay" + tt.groundOverlay);
+            tile_texture.setValue("Texture" + tt.groundTexture);
+            tile_horizontal.setValue("Horizontal Wall" + tt.horizontalWall);
+            tile_vertical.setValue("Vertical Wall" + tt.verticalWall);
+            tile_diagonal.setValue("Diagonal Wall" + tt.diagonalWall);
+            tile_roof.setValue("Roof Texture" + tt.roofTexture);
 
             /* // scene.remove(mesh);
              var tmesh = drawSector(sectorIndex);
