@@ -1,6 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
 
 Menubar.File = function ( editor ) {
 
@@ -19,8 +16,8 @@ Menubar.File = function ( editor ) {
 	// New
 
 	var open = new UI.Row();
-	open.setClass( 'open' );
-	open.setTextContent( 'Load .rscd' );
+	open.setClass( 'option' );
+	open.setTextContent( 'Load .RSCD' );
 	open.onClick( function () {
 
 	var fileInput = document.createElement( 'input' );
@@ -47,14 +44,13 @@ Menubar.File = function ( editor ) {
 	
 
 	} );
-	
+
 	options.add(open);
 	
-		var open = new UI.Row();
-	open.setClass( 'open' );
-	open.setTextContent( 'Load .jag' );
+	var open = new UI.Row();
+	open.setClass( 'option' );
+	open.setTextContent( 'Load .JAG' );
 	open.onClick( function () {
-
 	var fileInput = document.createElement( 'input' );
 	fileInput.type = 'file';
 	fileInput.addEventListener( 'change', function ( event ) {
@@ -63,16 +59,58 @@ Menubar.File = function ( editor ) {
 
 	} );
 	fileInput.click();
-	
-
 	} );
-	options.add( new UI.HorizontalRule() );
 	options.add(open);
 
 	//
 
-	//options.add( new UI.HorizontalRule() );
+	options.add( new UI.HorizontalRule() );
 
+
+    var open = new UI.Row();
+    open.setClass( 'option' );
+    open.setTextContent( 'Export .RSCD' );
+    open.onClick( function () {
+        var fileInput = document.createElement( 'input' );
+        fileInput.type = 'file';
+        fileInput.addEventListener( 'change', function ( event ) {
+
+
+
+        } );
+        fileInput.click();
+    } );
+    options.add(open);
+
+    var open = new UI.Row();
+    open.setClass( 'option' );
+    open.setTextContent( 'Export .JAG' );
+    open.onClick( function () {
+        var fileInput = document.createElement( 'input' );
+        fileInput.type = 'file';
+        fileInput.addEventListener( 'change', function ( event ) {
+
+
+
+        } );
+        fileInput.click();
+    } );
+    options.add(open);
+
+    var open = new UI.Row();
+    open.setClass( 'option' );
+    open.setTextContent( 'Export Sector' );
+    open.onClick( function () {
+        var fileInput = document.createElement( 'input' );
+        fileInput.type = 'file';
+        fileInput.addEventListener( 'change', function ( event ) {
+
+
+
+        } );
+        fileInput.click();
+    } );
+    options.add(open);
 
 
 	

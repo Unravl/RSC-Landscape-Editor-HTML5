@@ -1,6 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
 
 var Toolbar = function ( editor ) {
 
@@ -18,10 +15,15 @@ var Toolbar = function ( editor ) {
 	//buttons.add( grid );
 	var wireframe = new UI.THREE.Boolean( false, 'Wireframe' ).onChange( update );
 	buttons.add( wireframe );
+    var axis = new UI.THREE.Boolean( false, 'Axis' ).onChange( update );
+    buttons.add( axis );
+    var sects = new UI.THREE.Boolean( false, 'Surrounding Sectors' ).onChange( update );
+    buttons.add( sects );
+    sects.setValue(true);
+
 	var roofs = new UI.THREE.Boolean( false, 'Roofs' ).onChange( update );
 	buttons.add( roofs );
-		var sects = new UI.THREE.Boolean( false, 'Surrounding Sectors' ).onChange( update );
-	buttons.add( sects );
+
 	
 	/*
 

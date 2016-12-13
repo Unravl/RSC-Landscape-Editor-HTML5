@@ -1,6 +1,7 @@
-//var ui_x = "hehe";
+
 
 var ui_coords = new UI.Text( "" );
+var ui_local_coords = new UI.Text( "" );
 var sectorIdx = new UI.Text( "" );
 var sectorName = new UI.Text( "" );
 var  tileIdx = new UI.Text( "" );
@@ -14,24 +15,20 @@ var tile_roof = new UI.Text( "" );
 
 Sidebar.ViewMode = function ( editor ) {
 
-  //  var signals = editor.signals;
 
-   // var container = new UI.Span();
     var buttons = new UI.Panel();
-    //container.add( buttons );
 
-    buttons.add( ui_coords );
-    buttons.add(  sectorIdx );
-    buttons.add( sectorName );
-
-    buttons.add( tileIdx );
-    buttons.add( tile_elevation );
-    buttons.add(  tile_overlay );
-    buttons.add(  tile_texture );
-    buttons.add(  tile_vertical);
-    buttons.add( tile_diagonal );
-    buttons.add(tile_horizontal );
-    buttons.add(tile_roof );
+    buttons.add(new UI.Row().add( ui_coords ));
+    buttons.add(new UI.Row().add( ui_local_coords ));
+    buttons.add(new UI.Row().add(sectorName  ));
+    buttons.add(new UI.Row().add(tileIdx ));
+    buttons.add(new UI.Row().add( tile_elevation));
+    buttons.add(new UI.Row().add(tile_overlay ));
+    buttons.add(new UI.Row().add(tile_texture ));
+    buttons.add(new UI.Row().add(tile_vertical));
+    buttons.add(new UI.Row().add( tile_horizontal ));
+    buttons.add(new UI.Row().add( tile_diagonal ));
+    buttons.add(new UI.Row().add( tile_roof));
 
 
   /*  var objectTab = new UI.Text( 'OBJECT' ).onClick( onClick );

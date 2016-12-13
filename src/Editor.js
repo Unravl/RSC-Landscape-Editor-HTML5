@@ -455,36 +455,23 @@ function onDocumentMouseDown( event ) {
             // updateSectors();
             console.log("SUCCESS");
 
-            /**
-             localXY: "0, 0",
-             sectorName: "null",
-             sectorIdx: 0,
-             tileIdx: 0,
-             rscXY: "0, 0",
-             tile_elevation: 0,
-             tile_texture: 0,
-             tile_overlay: 0,
-             tile_horizontal: 0,
-             tile_vertical: 0,
-             tile_diagonal: 0,
-             tile_roof: 0
-             */
             var sectName = "h0x" + (SectorX + offsets[tt.sector][0]) + "y" + (SectorY + offsets[tt.sector][1]);
             guiItems.localXY = tt.x + ", " + tt.y;
-            var rscX = ((tt.absoluteSectorX - 48) * 48) + tt.x//tt.x + (48 * (SectorX - 48));
-            var rscY = ((((tt.absoluteSectorY - 36) * 48) + tt.y + 96) - 144) + (0 * 944) + 48 - 48;//tt.y + (48 * (SectorY - 36)) - 143 - 48;
+            var rscX = ((tt.absoluteSectorX - 48) * 48) + tt.x;
+            var rscY = ((((tt.absoluteSectorY - 36) * 48) + tt.y + 96) - 144) + (0 * 944) + 48 - 48;
             guiItems.rscXY = rscX + ", " + rscY;
-            ui_coords.setValue("\nRSC Coords: " + rscX + ", " + rscY);
-            sectorIdx.setValue("Sector Index" + tt.sector);
-            sectorName.setValue("Sector Name" + sectName);
-            tileIdx.setValue("Tile Index" + tile);
-            tile_elevation.setValue("Elevation" + tt.groundElevation);
-            tile_overlay.setValue("Overlay" + tt.groundOverlay);
-            tile_texture.setValue("Texture" + tt.groundTexture);
-            tile_horizontal.setValue("Horizontal Wall" + tt.horizontalWall);
-            tile_vertical.setValue("Vertical Wall" + tt.verticalWall);
-            tile_diagonal.setValue("Diagonal Wall" + tt.diagonalWall);
-            tile_roof.setValue("Roof Texture" + tt.roofTexture);
+            ui_coords.setValue("RSC XY: " + rscX + ", " + rscY);
+            ui_local_coords.setValue("Local XY: " + tt.x + ", " + tt.y);
+            sectorIdx.setValue("Sector Index: " + tt.sector);
+            sectorName.setValue("Sector Name: " + sectName);
+            tileIdx.setValue("Tile Index: " + tile);
+            tile_elevation.setValue("Elevation: " + tt.groundElevation);
+            tile_overlay.setValue("Overlay: " + tt.groundOverlay);
+            tile_texture.setValue("Texture: " + tt.groundTexture);
+            tile_horizontal.setValue("Horizontal Wall: " + tt.horizontalWall);
+            tile_vertical.setValue("Vertical Wall: " + tt.verticalWall);
+            tile_diagonal.setValue("Diagonal Wall: " + tt.diagonalWall);
+            tile_roof.setValue("Roof Texture: " + tt.roofTexture);
 
             /* // scene.remove(mesh);
              var tmesh = drawSector(sectorIndex);
