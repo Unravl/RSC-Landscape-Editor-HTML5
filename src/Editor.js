@@ -4,7 +4,7 @@
 
 var TILE_COUNT = 48;
 var TILE_MESH_SIZE = 1;
-var SectorX = 53;
+var SectorX = 51;
 var SectorY = 47;
 
 var container;
@@ -216,7 +216,8 @@ function drawSector(sectorIndex) {
     l = geometry.faces.length / 2;
     for (var i = 0; i < l; i++) {
         var j = 2 * i;
-        var til = Tiles[i + 48 * 48 * sectorIndex];
+        var tmpIdx = i + 48 * 48 * sectorIndex;
+        var til = Tiles[tmpIdx];
 
         if (til == null)
             continue;
@@ -228,8 +229,38 @@ function drawSector(sectorIndex) {
 
         var obj = overlay_map[til.groundOverlay];
         if(obj != null) {
-            geometry.faces[j].materialIndex = til.groundOverlay;
-            geometry.faces[j + 1].materialIndex = til.groundOverlay;
+            if(til.groundOverlay == 1) {
+                var tempTil = Tiles[tmpIdx - 1];
+                var tempTil2 = Tiles[tmpIdx + 1];
+                if(tempTil != null && tempTil2 != null) {
+                    if(tempTil.groundOverlay == til.groundOverlay && tempTil2.groundOverlay == til.groundOverlay) {
+                        geometry.faces[j].materialIndex = til.groundOverlay;
+                        geometry.faces[j + 1].materialIndex = til.groundOverlay;
+                    } else if(tempTil.groundOverlay == til.groundOverlay && tempTil2.groundOverlay != til.groundOverlay) {
+                        geometry.faces[j].materialIndex = til.groundOverlay;
+                    } else if(tempTil.groundOverlay != til.groundOverlay && tempTil2.groundOverlay == til.groundOverlay) {
+                        geometry.faces[j + 1].materialIndex = til.groundOverlay;
+                    }
+                }
+
+                var tempTil = Tiles[tmpIdx - (TILE_COUNT * 3)];
+                var tempTil2 = Tiles[tmpIdx + (TILE_COUNT * 3)];
+                if(tempTil != null && tempTil2 != null) {
+                    if(tempTil.groundOverlay == til.groundOverlay && tempTil2.groundOverlay == til.groundOverlay) {
+                        geometry.faces[j].materialIndex = til.groundOverlay;
+                        geometry.faces[j + 1].materialIndex = til.groundOverlay;
+                    } else if(tempTil.groundOverlay == til.groundOverlay && tempTil2.groundOverlay != til.groundOverlay) {
+                        geometry.faces[j].materialIndex = til.groundOverlay;
+                    } else if(tempTil.groundOverlay != til.groundOverlay && tempTil2.groundOverlay == til.groundOverlay) {
+                        geometry.faces[j + 1].materialIndex = til.groundOverlay;
+                    }
+                }
+            //    geometry.faces[j].materialIndex = til.groundOverlay; // top right face
+            } else {
+                geometry.faces[j].materialIndex = til.groundOverlay;
+                geometry.faces[j + 1].materialIndex = til.groundOverlay; // bottom left face
+            }
+
         }
     }
     /**
@@ -292,20 +323,38 @@ function drawSector(sectorIndex) {
 
         if (til.diagonalWall > 0) {
             var overlayGeom = new THREE.PlaneGeometry(1, 1);
-            var obj = overlay_map[1  + 350];
+
+            var obj = overlay_map[1 + 300];
             if(obj != null) {
-                overlayGeom.faces[0].materialIndex = 1  + 350;
-                overlayGeom.faces[1].materialIndex = 1  + 350;
+
+                overlayGeom.faces[0].materialIndex = 1 + 300;
+                overlayGeom.faces[1].materialIndex = 1 + 300;
 
                 var wall = new THREE.Mesh(overlayGeom, new THREE.MeshFaceMaterial(materials));
-                wall.rotation.y = Math.PI / 2;
+                wall.scale.set(1.42,1.42,1)
+              //  wall.rotation.y = Math.PI / 2;
                 // wall.rotation.x = 20;
                 wall.position.x = til.x - (TILE_COUNT / 2);
                 wall.position.y = til.y - (TILE_COUNT / 2) + 0.5;
                 wall.position.z = base + 0.5;
+                if(til.diagonalWall >= 12000) {
+                    wall.rotation.y = -(Math.PI / 4);
+                    wall.rotation.x = -(-1 * Math.PI / 2);
+                } else {
+                    wall.rotation.y = -(Math.PI / 4);
+                    wall.rotation.x = -(1 * Math.PI / 2);
+                }
+
+                /**
+                 * wall.rotation.y = Math.PI / 4;
+                 wall.rotation.x = 1 * Math.PI / 2;
+                 */
+
                 //  wall.rotation.z = Math.PI / 2;
                 wall.updateMatrix();
                 tempGeom.merge(wall.geometry, wall.matrix);
+            } else {
+                console.log("null diagonal wall: " + til.diagonalWall);
             }
         }
     }
