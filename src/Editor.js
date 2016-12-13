@@ -324,37 +324,33 @@ function drawSector(sectorIndex) {
         if (til.diagonalWall > 0) {
             var overlayGeom = new THREE.PlaneGeometry(1, 1);
 
-            var obj = overlay_map[1 + 300];
+            var obj = overlay_map[(til.diagonalWall >= 12000 ? (til.diagonalWall - 12000) : til.diagonalWall) + 300];
             if(obj != null) {
 
-                overlayGeom.faces[0].materialIndex = 1 + 300;
-                overlayGeom.faces[1].materialIndex = 1 + 300;
+                overlayGeom.faces[0].materialIndex = (til.diagonalWall >= 12000 ? (til.diagonalWall - 12000) : til.diagonalWall) + 300;
+                overlayGeom.faces[1].materialIndex = (til.diagonalWall >= 12000 ? (til.diagonalWall - 12000) : til.diagonalWall) + 300;
 
                 var wall = new THREE.Mesh(overlayGeom, new THREE.MeshFaceMaterial(materials));
                 wall.scale.set(1.42,1.42,1)
-              //  wall.rotation.y = Math.PI / 2;
-                // wall.rotation.x = 20;
-                wall.position.x = til.x - (TILE_COUNT / 2);
+                var left = til.diagonalWall >= 12000;
+
                 wall.position.y = til.y - (TILE_COUNT / 2) + 0.5;
                 wall.position.z = base + 0.5;
-                if(til.diagonalWall >= 12000) {
+                wall.position.x = til.x - (TILE_COUNT / 2) + 0.5;
+                if(left) {
                     wall.rotation.y = -(Math.PI / 4);
                     wall.rotation.x = -(-1 * Math.PI / 2);
+
                 } else {
-                    wall.rotation.y = -(Math.PI / 4);
-                    wall.rotation.x = -(1 * Math.PI / 2);
+                    wall.rotation.y = (Math.PI / 4);
+                    wall.rotation.x = (1 * Math.PI / 2);
+
                 }
 
-                /**
-                 * wall.rotation.y = Math.PI / 4;
-                 wall.rotation.x = 1 * Math.PI / 2;
-                 */
-
-                //  wall.rotation.z = Math.PI / 2;
                 wall.updateMatrix();
                 tempGeom.merge(wall.geometry, wall.matrix);
             } else {
-                console.log("null diagonal wall: " + til.diagonalWall);
+                console.log("null diagonal wall: " + til.diagonalWall + " : " + (til.diagonalWall >= 12000 ? (til.diagonalWall - 12000) : til.diagonalWall) + 400);
             }
         }
     }
