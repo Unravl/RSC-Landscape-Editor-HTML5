@@ -6,7 +6,7 @@ var TILE_COUNT = 48;
 var TILE_MESH_SIZE = 1;
 var SectorX = 51;
 var SectorY = 47;
-
+var sectorsLoaded = false;
 var container;
 var camera, scene, renderer, controls;
 var mouse, raycaster, isShiftDown = false;
@@ -37,31 +37,10 @@ var guiItems =
     };
 
 
-function loadGui() {
-
-    selected = gui.addFolder('Selected Tile');
-    selected.add(guiItems, 'rscXY').name("RSC XY").listen();
-    selected.add(guiItems, 'localXY').name("Local XY").listen();
-    selected.add(guiItems, 'sectorName').name("Sector Name").listen();
-    selected.add(guiItems, 'sectorIdx').name("Sector Index").listen();
-    selected.add(guiItems, 'tileIdx').name("Tile Index").listen();
-    selected.add(guiItems, 'tile_overlay').name("Overlay").listen();
-    selected.add(guiItems, 'tile_texture').name("Texture").listen();
-    selected.add(guiItems, 'tile_elevation').name("Elevation").listen();
-    selected.add(guiItems, 'tile_horizontal').name("Horizontal Wall").listen();
-    selected.add(guiItems, 'tile_vertical').name("Vertical Wall").listen();
-    selected.add(guiItems, 'tile_diagonal').name("Diagonal").listen();
-    selected.add(guiItems, 'tile_roof').name("Roof").listen();
-    //selected.open();
-    gui.open();
-}
-
-
 function initEditor() {
     try {
         setup();
         html();
-        //   loadGui();
         animate();
     } catch(err) {
         alert(err);
@@ -110,7 +89,6 @@ function openFile(event) {
 }
 
 
-var sectorsLoaded = false;
 function unpackSectors() {
     Tiles = new Array((TILE_COUNT*TILE_COUNT) * Sectors.length);
     var sectX = 0;
@@ -136,11 +114,6 @@ function unpackSectors() {
     sectorsLoaded = true;
 }
 
-var masterGeometry;
-
-function temp() {
-
-}
 
 function updateSectors() {
 
@@ -169,19 +142,22 @@ function updateSectors() {
 
     }
 
+
+
     var add = mesh == null;
     mesh = new THREE.Mesh(masterGeometry, new THREE.MeshFaceMaterial(materials));
-    // if(add)
+
+    var geo = new THREE.WireframeGeometry( masterGeometry); // or WireframeGeometry
+    var mat = new THREE.LineBasicMaterial( { color: 0xffffff, linewidth: 2 } );
+    var wireframe = new THREE.LineSegments( geo, mat );
+    mesh.add( wireframe );
     scene.add(mesh);
-    //else {
-    //    mesh.updateMatrix();
-    //    mesh.geometry.verticesNeedUpdate = true;
-    // }
+
 }
 
 function drawSector(sectorIndex) {
 
-    var geometry = new THREE.PlaneGeometry((TILE_MESH_SIZE * TILE_COUNT), (TILE_MESH_SIZE * TILE_COUNT), TILE_COUNT, TILE_COUNT);
+    var geometry = new THREE.PlaneGeometry((TILE_MESH_SIZE * TILE_COUNT), (TILE_MESH_SIZE * TILE_COUNT), TILE_COUNT * 2, TILE_COUNT * 2);
 
     /**
      *
@@ -229,31 +205,72 @@ function drawSector(sectorIndex) {
 
         var obj = overlay_map[til.groundOverlay];
         if(obj != null) {
-            if(til.groundOverlay == 1) {
+            if(til.groundOverlay != 1111) { // change this to 1, to work with roads
+              //  var tempTil = Tiles[tmpIdx - 1];
+               // var tempTil2 = Tiles[tmpIdx + 1];
                 var tempTil = Tiles[tmpIdx - 1];
-                var tempTil2 = Tiles[tmpIdx + 1];
-                if(tempTil != null && tempTil2 != null) {
-                    if(tempTil.groundOverlay == til.groundOverlay && tempTil2.groundOverlay == til.groundOverlay) {
+                var tempTil2 = Tiles[tmpIdx - (TILE_COUNT * 1)];
+
+                var top = Tiles[tmpIdx - (TILE_COUNT * 1)];
+                var topRight = Tiles[tmpIdx - (TILE_COUNT * 1) - 1];
+                var topLeft = Tiles[tmpIdx - (TILE_COUNT * 1) + 1];
+                var right = Tiles[tmpIdx - 1];
+                var left = Tiles[tmpIdx + 1];
+
+                var bottom = Tiles[tmpIdx + (TILE_COUNT * 1)];
+                var bottomRight = Tiles[tmpIdx + (TILE_COUNT * 1) - 1];
+                var bottomLeft = Tiles[tmpIdx + (TILE_COUNT * 1) + 1];
+                if(top != null && topRight != null && right != null && bottom != null && bottomRight != null) {
+                    /*if(top.groundOverlay != til.groundOverlay && topRight.groundOverlay != til.groundOverlay && right.groundOverlay != til.groundOverlay && bottom.groundOverlay == til.groundOverlay && bottomRight.groundOverlay == til.groundOverlay) {
+                        geometry.faces[j + 1].materialIndex = til.groundOverlay;
+                        continue;
+                    } else if(bottom.groundOverlay != til.groundOverlay && left.groundOverlay != til.groundOverlay && bottomLeft.groundOverlay != til.groundOverlay && top.groundOverlay == til.groundOverlay && topRight.groundOverlay == til.groundOverlay) {
+
+
+                        geometry.faces[j].materialIndex = til.groundOverlay;
+                        continue;
+                    }*/
+                   /* if(left.horizontalWall > 0 || til.horizontalWall > 0) {
                         geometry.faces[j].materialIndex = til.groundOverlay;
                         geometry.faces[j + 1].materialIndex = til.groundOverlay;
-                    } else if(tempTil.groundOverlay == til.groundOverlay && tempTil2.groundOverlay != til.groundOverlay) {
+
+
+                    }
+                    else*/ if(top.groundOverlay != til.groundOverlay && right.groundOverlay != til.groundOverlay) {
+
+                       // geometry.faces[j + 1].materialIndex = til.groundOverlay;
+                    } else if(bottom.groundOverlay != til.groundOverlay && left.groundOverlay != til.groundOverlay) {
                         geometry.faces[j].materialIndex = til.groundOverlay;
-                    } else if(tempTil.groundOverlay != til.groundOverlay && tempTil2.groundOverlay == til.groundOverlay) {
+                    }
+                    else {
+                        geometry.faces[j].materialIndex = til.groundOverlay;
                         geometry.faces[j + 1].materialIndex = til.groundOverlay;
                     }
                 }
 
-                var tempTil = Tiles[tmpIdx - (TILE_COUNT * 3)];
-                var tempTil2 = Tiles[tmpIdx + (TILE_COUNT * 3)];
                 if(tempTil != null && tempTil2 != null) {
-                    if(tempTil.groundOverlay == til.groundOverlay && tempTil2.groundOverlay == til.groundOverlay) {
+                   /* if(tempTil.groundOverlay == til.groundOverlay && tempTil2.groundOverlay == til.groundOverlay) {
                         geometry.faces[j].materialIndex = til.groundOverlay;
                         geometry.faces[j + 1].materialIndex = til.groundOverlay;
                     } else if(tempTil.groundOverlay == til.groundOverlay && tempTil2.groundOverlay != til.groundOverlay) {
                         geometry.faces[j].materialIndex = til.groundOverlay;
+
                     } else if(tempTil.groundOverlay != til.groundOverlay && tempTil2.groundOverlay == til.groundOverlay) {
                         geometry.faces[j + 1].materialIndex = til.groundOverlay;
-                    }
+                    }*/
+                }
+
+                var tempTil = Tiles[tmpIdx + 1];
+                var tempTil2 = Tiles[tmpIdx + (TILE_COUNT * 1)];
+                if(tempTil != null && tempTil2 != null) {
+                   /* if(tempTil.groundOverlay == til.groundOverlay && tempTil2.groundOverlay == til.groundOverlay) {
+                        geometry.faces[j].materialIndex = til.groundOverlay;
+                        geometry.faces[j + 1].materialIndex = til.groundOverlay;
+                    } else if(tempTil.groundOverlay == til.groundOverlay && tempTil2.groundOverlay != til.groundOverlay) {
+                       // geometry.faces[j].materialIndex = til.groundOverlay;
+                    } else if(tempTil.groundOverlay != til.groundOverlay && tempTil2.groundOverlay == til.groundOverlay) {
+                       // geometry.faces[j + 1].materialIndex = til.groundOverlay;
+                    }*/
                 }
             //    geometry.faces[j].materialIndex = til.groundOverlay; // top right face
             } else {
@@ -469,7 +486,7 @@ function onDocumentMouseDown( event ) {
         var intersect = intersects[ 0 ];
 
         var x = Math.floor(Math.abs(intersect.point.x));
-        var y = Math.floor(Math.abs(intersect.point.y)) - 1;
+        var y = Math.floor(Math.abs(intersect.point.y));
 
         var tempSectX = 0;
         var tempSectY = 0;
