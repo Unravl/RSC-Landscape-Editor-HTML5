@@ -29,6 +29,7 @@ function prepMaterials() {
     overlay_map[5] = new THREE.MeshBasicMaterial({color: 0x404040}); //grey tile
     overlay_map[6] = new THREE.MeshBasicMaterial({color: 0x6F0410}); // red tile
     overlay_map[16] = new THREE.MeshBasicMaterial({color: 0x000000}); // black tile
+    overlay_map[8] = new THREE.MeshBasicMaterial({color: 0x000000}); // black tile
     overlay_map[9] = new THREE.MeshBasicMaterial({color: 0xA9A9A9}); // grey mountain side surface
     // new THREE.MeshBasicMaterial({color: 0x367f23});
 

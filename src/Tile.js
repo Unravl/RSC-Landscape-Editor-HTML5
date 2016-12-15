@@ -11,6 +11,7 @@ function Tile(sector, sectX, sectY, x, y, groundElevation, groundTexture, ground
     this.sectY = sectY;
     this.absoluteSectorX = absoluteSectorX;
     this.absoluteSectorY = absoluteSectorY;
+    this.faceIdx = -1;
 
 
 
