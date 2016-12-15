@@ -70,14 +70,14 @@ function openFile(event) {
             updateSectors();
             camera.position.set(0,0,200);
             //camera.target.set(0, 0, 0);
-            //	camera.rotation.set(-200, 0, 0);
+            	camera.rotation.set(-200, 0, 0);
             controls = new THREE.OrbitControls( camera, renderer.domElement );
             controls.enableDamping = true;
             controls.dampingFactor = 0.25;
             controls.zoomSpeed = 0.5;
             //controls.target..x -= 100;
             //controls.target.set(50, (48/2*3), -100);
-            controls.enabled = false;
+  
             controls.enabled = true;
             controls.enablePan = true;
             controls.enableZoom = true;
@@ -115,6 +115,51 @@ function unpackSectors() {
 }
 
 
+<<<<<<< HEAD
+=======
+function updateSectors() {
+
+
+    //scene.remove(mesh);
+    masterGeometry = new THREE.PlaneGeometry(0 , 0 , 0, 0);
+
+    var sectX = 0;
+    var sectY = 0;
+
+    for(var s=0; s < Sectors.length; s++) {
+        if (sectX == Math.sqrt(Sectors.length)) {
+            sectX = 0;
+            sectY++;
+        }
+        var sectorIndex = s;
+        var idx = 0;
+        var view = Sectors[s];
+        var tmesh = drawSector(sectorIndex);
+        tmesh.position.set(-(TILE_MESH_SIZE * TILE_COUNT / 2) - 48 * sectX, -(TILE_MESH_SIZE * TILE_COUNT / 2) - 48  * sectY, 0);
+        tmesh.rotation.z = -Math.PI / 2;
+
+        tmesh.updateMatrix();
+        masterGeometry.merge(tmesh.geometry, tmesh.matrix);
+        sectX++;
+
+    }
+
+	
+
+
+	//if(mesh != null)  {
+    mesh = new THREE.Mesh(masterGeometry, new THREE.MeshFaceMaterial(materials));
+	
+   /// var geo = new THREE.WireframeGeometry( masterGeometry); // or WireframeGeometry
+    //var mat = new THREE.LineBasicMaterial( { color: 0xffffff, linewidth: 2 } );
+    //var wireframe = new THREE.LineSegments( geo, mat );
+    //mesh.add( wireframe );
+    scene.add(mesh);
+//	}
+
+}
+
+>>>>>>> origin/master
 function drawSector(sectorIndex) {
 
     var geometry = new THREE.PlaneGeometry((TILE_MESH_SIZE * TILE_COUNT), (TILE_MESH_SIZE * TILE_COUNT), TILE_COUNT, TILE_COUNT);
@@ -181,6 +226,13 @@ function drawSector(sectorIndex) {
                 var bottom = Tiles[tmpIdx + (TILE_COUNT * 1)];
                 var bottomRight = Tiles[tmpIdx + (TILE_COUNT * 1) - 1];
                 var bottomLeft = Tiles[tmpIdx + (TILE_COUNT * 1) + 1];
+				
+					if(til.groundOverlay != 1) {
+						   geometry.faces[j].materialIndex = til.groundOverlay;
+                        geometry.faces[j + 1].materialIndex = til.groundOverlay;
+						continue;
+						
+					}
                 if(top != null && topRight != null && right != null && bottom != null && bottomRight != null) {
                     geometry.faces[j].materialIndex = til.groundOverlay;
                     geometry.faces[j + 1].materialIndex = til.groundOverlay;
@@ -199,14 +251,17 @@ function drawSector(sectorIndex) {
 
 
                     }
-                    else*/ if(top.groundOverlay != til.groundOverlay && right.groundOverlay != til.groundOverlay) {
+                    else*/ 
+				
+					
+					if(top.groundOverlay != til.groundOverlay && right.groundOverlay != til.groundOverlay) {
 
-                       // geometry.faces[j + 1].materialIndex = til.groundOverlay;
+                        geometry.faces[j + 1].materialIndex = til.groundOverlay;
                     } else if(bottom.groundOverlay != til.groundOverlay && left.groundOverlay != til.groundOverlay) {
                         geometry.faces[j].materialIndex = til.groundOverlay;
                         geometry.faces[j + 1].materialIndex = til.groundOverlay;
                     }
-                    else {
+					 else {
                         geometry.faces[j].materialIndex = til.groundOverlay;
                         geometry.faces[j + 1].materialIndex = til.groundOverlay;
                     }
